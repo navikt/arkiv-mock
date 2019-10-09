@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "joark")
-class JoarkData(
+class JoarkDbData(
 	@Id
 	val id: String,
 	val message: String,

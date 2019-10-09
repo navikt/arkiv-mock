@@ -1,6 +1,6 @@
 package no.nav.soknad.archiving.joarkmock
 
-import no.nav.soknad.archiving.dto.ArchivalData
+import no.nav.soknad.archiving.dto.JoarkData
 import no.nav.soknad.archiving.joarkmock.rest.JoarkRestInterface
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -19,7 +19,7 @@ class IntegrationTest {
 		val id = "Apa bepa"
 		val message = "cepa depa"
 
-		joarkRestInterface.receiveMessage(ArchivalData(id, message))
+		joarkRestInterface.receiveMessage(JoarkData(id, message, emptyList()))
 
 		val result = joarkRestInterface.lookup(id)
 		assertEquals(1, result.size)
