@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class JoarkMongoService(private val joarkRepository: JoarkRepository) {
+class JoarkMockService(private val joarkRepository: JoarkRepository) {
 
 	fun archive(id: String, message: String) {
 		joarkRepository.save(JoarkDbData(UUID.randomUUID().toString(), message, id))
