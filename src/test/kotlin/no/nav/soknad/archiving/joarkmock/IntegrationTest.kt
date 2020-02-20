@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import java.time.LocalDateTime
 
 @SpringBootTest
 class IntegrationTest {
@@ -19,7 +20,7 @@ class IntegrationTest {
 		val id = "Apa bepa"
 		val message = "cepa depa"
 
-		joarkRestInterface.receiveMessage(JoarkData(id, message, emptyList()))
+		joarkRestInterface.receiveMessage(createRequestData(id, message))
 
 		val result = joarkRestInterface.lookup(id)
 		assertEquals(1, result.size)
@@ -33,4 +34,7 @@ class IntegrationTest {
 
 		assertTrue(result.isEmpty())
 	}
+
+	private fun createRequestData(eksternReferanseId: String, tema: String) =
+		JoarkData(eksternReferanseId, "personId", "FNR", tema, LocalDateTime.now(), emptyList(), emptyList())
 }

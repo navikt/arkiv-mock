@@ -18,7 +18,7 @@ class JoarkRestInterface(private val joarkMockService: JoarkMockService) {
 	fun receiveMessage(@Valid @RequestBody joarkData: JoarkData): ResponseEntity<String> {
 		logger.info("Received message: '$joarkData'")
 
-		joarkMockService.archive(joarkData.id, joarkData.message)
+		joarkMockService.archive(joarkData)
 		return ResponseEntity("", HttpStatus.OK)
 	}
 
