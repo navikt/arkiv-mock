@@ -2,7 +2,7 @@ package no.nav.soknad.archiving.joarkmock.rest
 
 import no.nav.soknad.archiving.dto.JoarkData
 import no.nav.soknad.archiving.joarkmock.dto.JoarkDbData
-import no.nav.soknad.archiving.joarkmock.service.JoarkMongoService
+import no.nav.soknad.archiving.joarkmock.service.JoarkMockService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -11,20 +11,20 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/joark")
-class JoarkRestInterface(private val joarkMongoService: JoarkMongoService) {
+class JoarkRestInterface(private val joarkMockService: JoarkMockService) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
 	@PostMapping(value = ["/save"])
 	fun receiveMessage(@Valid @RequestBody joarkData: JoarkData): ResponseEntity<String> {
 		logger.info("Received message: '$joarkData'")
 
-		joarkMongoService.archive(joarkData.id, joarkData.message)
+		joarkMockService.archive(joarkData)
 		return ResponseEntity("", HttpStatus.OK)
 	}
 
 	@GetMapping("/lookup/{name}")
 	fun lookup(@PathVariable("name") name: String): List<JoarkDbData> {
 		logger.info("Looking up '$name'")
-		return joarkMongoService.lookup(name)
+		return joarkMockService.lookup(name)
 	}
 }
