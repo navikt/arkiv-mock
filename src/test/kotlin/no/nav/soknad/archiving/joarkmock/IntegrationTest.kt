@@ -35,6 +35,6 @@ class IntegrationTest {
 		assertTrue(result.isEmpty())
 	}
 
-	private fun createRequestData(eksternReferanseId: String, tema: String) =
-		JoarkData(eksternReferanseId, "personId", "FNR", tema, LocalDateTime.now(), emptyList(), emptyList())
+	private fun createRequestData(personId: String, tema: String) =
+		JoarkData("eksternReferanseId", personId, "FNR", tema, LocalDateTime.now(), emptyList(), emptyList())
 }
