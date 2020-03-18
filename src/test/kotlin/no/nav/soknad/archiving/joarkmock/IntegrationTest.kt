@@ -1,5 +1,6 @@
 package no.nav.soknad.archiving.joarkmock
 
+import no.nav.soknad.archiving.dto.Bruker
 import no.nav.soknad.archiving.dto.JoarkData
 import no.nav.soknad.archiving.joarkmock.rest.JoarkRestInterface
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -7,7 +8,8 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import java.time.LocalDateTime
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @SpringBootTest
 class IntegrationTest {
@@ -36,5 +38,6 @@ class IntegrationTest {
 	}
 
 	private fun createRequestData(personId: String, tema: String) =
-		JoarkData("eksternReferanseId", personId, "FNR", tema, LocalDateTime.now(), emptyList(), emptyList())
+		JoarkData(Bruker(personId, "FNR"), LocalDate.now().format(DateTimeFormatter.ISO_DATE), emptyList(),
+			personId, "INNGAAENDE", "NAV_NO", tema, "tittel")
 }

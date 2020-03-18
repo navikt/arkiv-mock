@@ -19,5 +19,5 @@ class JoarkMockService(private val joarkRepository: JoarkRepository) {
 	}
 
 	private fun createJoarkDbData(joarkData: JoarkData) =
-		JoarkDbData(UUID.randomUUID().toString(), joarkData.tema, joarkData.personId)
+		JoarkDbData(UUID.randomUUID().toString(), joarkData.tema, joarkData.eksternReferanseId)
 }
