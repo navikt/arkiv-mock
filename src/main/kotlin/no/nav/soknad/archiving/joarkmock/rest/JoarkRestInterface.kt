@@ -18,8 +18,8 @@ class JoarkRestInterface(private val joarkMockService: JoarkMockService) {
 	fun receiveMessage(@Valid @RequestBody joarkData: JoarkData): ResponseEntity<String> {
 		logger.info("Received message: '$joarkData'")
 
-		joarkMockService.archive(joarkData)
-		return ResponseEntity("", HttpStatus.OK)
+		val responseBody = joarkMockService.archive(joarkData)
+		return ResponseEntity(responseBody, HttpStatus.OK)
 	}
 
 	@GetMapping("/lookup/{name}")

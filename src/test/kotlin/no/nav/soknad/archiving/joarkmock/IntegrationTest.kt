@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 @SpringBootTest
 class IntegrationTest {
@@ -19,8 +20,8 @@ class IntegrationTest {
 
 	@Test
 	fun `Will save to database when receiving message`() {
-		val id = "Apa bepa"
-		val message = "cepa depa"
+		val id = UUID.randomUUID().toString()
+		val message = "apa bepa"
 
 		joarkRestInterface.receiveMessage(createRequestData(id, message))
 
