@@ -27,14 +27,15 @@ class BehaviourMockingTest {
 	@Autowired
 	private lateinit var behaviourMocking: BehaviourMocking
 
+	private val id = UUID.randomUUID().toString()
+
 	@BeforeEach
 	fun setup() {
-		behaviourMocking.resetMockResponseBehaviour()
+		behaviourMocking.resetMockResponseBehaviour(id)
 	}
 
 	@Test
 	fun `No specified mock behaviour - Will save to DB`() {
-		val id = UUID.randomUUID().toString()
 		val response = joarkRestInterface.receiveMessage(createRequestData(id))
 
 		assertEquals(HttpStatus.OK, response.statusCode)
@@ -44,13 +45,12 @@ class BehaviourMockingTest {
 		val result = joarkRestInterface.lookup(id)
 		assertEquals(1, result.size)
 
-		assertEquals(1, behaviourMocking.getNumberOfCalls())
+		assertEquals(1, behaviourMocking.getNumberOfCalls(id))
 	}
 
 	@Test
 	fun `Mock response with Ok Status but wrong body - Will save to DB`() {
-		val id = UUID.randomUUID().toString()
-		behaviourMocking.mockOkResponseWithErroneousBody()
+		behaviourMocking.mockOkResponseWithErroneousBody(id, 1)
 
 		val response = joarkRestInterface.receiveMessage(createRequestData(id))
 
@@ -60,13 +60,12 @@ class BehaviourMockingTest {
 		val result = joarkRestInterface.lookup(id)
 		assertEquals(1, result.size)
 
-		assertEquals(1, behaviourMocking.getNumberOfCalls())
+		assertEquals(1, behaviourMocking.getNumberOfCalls(id))
 	}
 
 	@Test
 	fun `Mock Joark responds with status 404 two times, third works - Will save to DB on third attempt`() {
-		val id = UUID.randomUUID().toString()
-		behaviourMocking.mockResponseBehaviour(404, 2)
+		behaviourMocking.mockResponseBehaviour(id, 404, 2)
 
 		assertThrows<NotFoundException> {
 			joarkRestInterface.receiveMessage(createRequestData(id))
@@ -82,13 +81,12 @@ class BehaviourMockingTest {
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals(1, joarkRestInterface.lookup(id).size)
 
-		assertEquals(3, behaviourMocking.getNumberOfCalls())
+		assertEquals(3, behaviourMocking.getNumberOfCalls(id))
 	}
 
 	@Test
 	fun `Mock Joark responds with status 500 three times, third works - Will save to DB on third attempt`() {
-		val id = UUID.randomUUID().toString()
-		behaviourMocking.mockResponseBehaviour(500, 3)
+		behaviourMocking.mockResponseBehaviour(id, 500, 3)
 
 		assertThrows<InternalServerErrorException> {
 			joarkRestInterface.receiveMessage(createRequestData(id))
@@ -109,7 +107,7 @@ class BehaviourMockingTest {
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals(1, joarkRestInterface.lookup(id).size)
 
-		assertEquals(4, behaviourMocking.getNumberOfCalls())
+		assertEquals(4, behaviourMocking.getNumberOfCalls(id))
 	}
 
 	private fun createRequestData(personId: String) =

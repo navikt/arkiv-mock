@@ -2,6 +2,7 @@ package no.nav.soknad.archiving.joarkmock
 
 import no.nav.soknad.archiving.dto.Bruker
 import no.nav.soknad.archiving.dto.JoarkData
+import no.nav.soknad.archiving.joarkmock.rest.BehaviourMocking
 import no.nav.soknad.archiving.joarkmock.rest.JoarkRestInterface
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -18,9 +19,13 @@ class IntegrationTest {
 	@Autowired
 	private lateinit var joarkRestInterface: JoarkRestInterface
 
+	@Autowired
+	private lateinit var behaviourMocking: BehaviourMocking
+
 	@Test
 	fun `Will save to database when receiving message`() {
 		val id = UUID.randomUUID().toString()
+		behaviourMocking.setNormalResponseBehaviour(id)
 		val message = "apa bepa"
 
 		joarkRestInterface.receiveMessage(createRequestData(id, message))

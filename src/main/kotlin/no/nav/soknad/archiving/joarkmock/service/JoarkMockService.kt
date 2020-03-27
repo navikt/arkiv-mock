@@ -12,13 +12,13 @@ import java.util.*
 class JoarkMockService(private val joarkRepository: JoarkRepository, private val behaviourService: BehaviourService) {
 
 	fun archive(joarkData: JoarkData): String {
-		behaviourService.reactToArchiveRequest()
+		behaviourService.reactToArchiveRequest(joarkData.eksternReferanseId)
 
 		val data = createJoarkDbData(joarkData)
 		joarkRepository.save(data)
 
 		val response = createResponse(joarkData, data)
-		return behaviourService.alterResponse(response)
+		return behaviourService.alterResponse(joarkData.eksternReferanseId, response)
 	}
 
 	private fun createResponse(joarkData: JoarkData, data: JoarkDbData): JoarkResponse {
