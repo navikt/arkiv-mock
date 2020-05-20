@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.validation.Valid
 
 @RestController
 @RequestMapping("/joark")
@@ -15,7 +14,7 @@ class JoarkRestInterface(private val joarkMockService: JoarkMockService) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
 	@PostMapping(value = ["/save"])
-	fun receiveMessage(@Valid @RequestBody joarkData: JoarkData): ResponseEntity<String> {
+	fun receiveMessage(@RequestBody joarkData: JoarkData): ResponseEntity<String> {
 		logger.info("Received message: '$joarkData'")
 
 		val responseBody = joarkMockService.archive(joarkData)
