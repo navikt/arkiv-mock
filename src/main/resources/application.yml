@@ -16,22 +16,22 @@ management:
       prometheus:
         enabled: true
 
-spring:
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-  datasource:
-    hikari:
-      connection-timeout: 20000
-      maximum-pool-size: 5
-    driverClassName: org.postgresql.Driver
-    username: postgres
-    password: postgres
-    url: jdbc:postgresql://localhost:5432/postgres
+#spring:
+#  jpa:
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#  datasource:
+#    hikari:
+#      connection-timeout: 20000
+#      maximum-pool-size: 5
+#    driverClassName: org.postgresql.Driver
+#    username: postgres
+#    password: postgres
+#    url: jdbc:postgresql://localhost:5432/postgres
 
 
----
-spring:
-  profiles: docker
+#---
+#spring:
+#  profiles: docker
 
-  datasource:
-    url: jdbc:postgresql://postgres:5432/postgres
+#  datasource:
+#    url: jdbc:postgresql://postgres:5432/postgres
