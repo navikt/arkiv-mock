@@ -14,7 +14,7 @@ class JoarkDbData(
 	val message: String,
 	val name: String
 ) {
-	override fun toString(): String{
+	override fun toString(): String {
 		val mapper = ObjectMapper()
 		mapper.enable(SerializationFeature.INDENT_OUTPUT)
 		return mapper.writeValueAsString(this)
