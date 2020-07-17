@@ -63,7 +63,7 @@ class BehaviourService(val objectMapper: ObjectMapper) {
 		val behaviour = behaviours[uuid]!!
 		return if (behaviour.behaviour == BEHAVIOUR.RESPOND_WITH_ERRONEOUS_BODY && behaviour.calls <= behaviour.forAttempts) {
 			logger.info("For id=$uuid, will return erroneous response.")
-			"THIS IS A MOCKED INVALID RESPONSE"
+			"THIS_IS_A_MOCKED_INVALID_RESPONSE"
 		} else {
 			logger.info("For id=$uuid, will return normal response")
 			jsonResponse
