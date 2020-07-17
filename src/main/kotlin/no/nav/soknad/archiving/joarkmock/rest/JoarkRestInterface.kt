@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/joark")
@@ -21,9 +22,15 @@ class JoarkRestInterface(private val joarkMockService: JoarkMockService) {
 		return ResponseEntity(responseBody, HttpStatus.OK)
 	}
 
-	@GetMapping("/lookup/{name}")
-	fun lookup(@PathVariable("name") name: String): List<JoarkDbData> {
-		logger.info("Looking up '$name'")
-		return joarkMockService.lookup(name)
+	@GetMapping("/lookup/{id}")
+	fun lookup(@PathVariable("id") id: String): JoarkDbData {
+		logger.info("Looking up '$id'")
+		val response = joarkMockService.lookup(id)
+
+		if (response.isPresent) {
+			return response.get()
+		} else {
+			throw ResponseStatusException(HttpStatus.NOT_FOUND, "Failed to find $id")
+		}
 	}
 }

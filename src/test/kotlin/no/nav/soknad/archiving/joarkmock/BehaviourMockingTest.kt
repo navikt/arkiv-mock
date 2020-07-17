@@ -14,6 +14,7 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
+import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -42,8 +43,7 @@ class BehaviourMockingTest {
 		assertTrue(response.body!!.contains("{\"dokumenter\":[],\"journalpostId\":\""))
 		assertTrue(response.body!!.contains("\",\"journalpostferdigstilt\":true,\"journalstatus\":\"MIDLERTIDIG\",\"melding\":\"null\"}"))
 
-		val result = joarkRestInterface.lookup(id)
-		assertEquals(1, result.size)
+		joarkRestInterface.lookup(id)
 
 		assertEquals(1, behaviourMocking.getNumberOfCalls(id))
 	}
@@ -57,8 +57,7 @@ class BehaviourMockingTest {
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals("THIS IS A MOCKED INVALID RESPONSE", response.body)
 
-		val result = joarkRestInterface.lookup(id)
-		assertEquals(1, result.size)
+		joarkRestInterface.lookup(id)
 
 		assertEquals(1, behaviourMocking.getNumberOfCalls(id))
 	}
@@ -70,16 +69,20 @@ class BehaviourMockingTest {
 		assertThrows<NotFoundException> {
 			joarkRestInterface.receiveMessage(createRequestData(id))
 		}
-		assertEquals(0, joarkRestInterface.lookup(id).size)
+		assertThrows<ResponseStatusException> {
+			joarkRestInterface.lookup(id)
+		}
 
 		assertThrows<NotFoundException> {
 			joarkRestInterface.receiveMessage(createRequestData(id))
 		}
-		assertEquals(0, joarkRestInterface.lookup(id).size)
+		assertThrows<ResponseStatusException> {
+			joarkRestInterface.lookup(id)
+		}
 
 		val response = joarkRestInterface.receiveMessage(createRequestData(id))
 		assertEquals(HttpStatus.OK, response.statusCode)
-		assertEquals(1, joarkRestInterface.lookup(id).size)
+		joarkRestInterface.lookup(id)
 
 		assertEquals(3, behaviourMocking.getNumberOfCalls(id))
 	}
@@ -91,21 +94,27 @@ class BehaviourMockingTest {
 		assertThrows<InternalServerErrorException> {
 			joarkRestInterface.receiveMessage(createRequestData(id))
 		}
-		assertEquals(0, joarkRestInterface.lookup(id).size)
+		assertThrows<ResponseStatusException> {
+			joarkRestInterface.lookup(id)
+		}
 
 		assertThrows<InternalServerErrorException> {
 			joarkRestInterface.receiveMessage(createRequestData(id))
 		}
-		assertEquals(0, joarkRestInterface.lookup(id).size)
+		assertThrows<ResponseStatusException> {
+			joarkRestInterface.lookup(id)
+		}
 
 		assertThrows<InternalServerErrorException> {
 			joarkRestInterface.receiveMessage(createRequestData(id))
 		}
-		assertEquals(0, joarkRestInterface.lookup(id).size)
+		assertThrows<ResponseStatusException> {
+			joarkRestInterface.lookup(id)
+		}
 
 		val response = joarkRestInterface.receiveMessage(createRequestData(id))
 		assertEquals(HttpStatus.OK, response.statusCode)
-		assertEquals(1, joarkRestInterface.lookup(id).size)
+		joarkRestInterface.lookup(id)
 
 		assertEquals(4, behaviourMocking.getNumberOfCalls(id))
 	}

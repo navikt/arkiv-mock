@@ -11,8 +11,8 @@ import javax.persistence.Table
 class JoarkDbData(
 	@Id
 	val id: String,
-	val message: String,
-	val name: String
+	val title: String,
+	val tema: String
 ) {
 	override fun toString(): String {
 		val mapper = ObjectMapper()

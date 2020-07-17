@@ -6,6 +6,7 @@ import no.nav.soknad.archiving.dto.JoarkResponse
 import no.nav.soknad.archiving.joarkmock.dto.JoarkDbData
 import no.nav.soknad.archiving.joarkmock.repository.JoarkRepository
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -26,10 +27,10 @@ class JoarkMockService(private val joarkRepository: JoarkRepository, private val
 		return JoarkResponse(dokumenter, data.id, true, "MIDLERTIDIG", "null")
 	}
 
-	fun lookup(name: String): List<JoarkDbData> {
-		return joarkRepository.findByName(name)
+	fun lookup(id: String): Optional<JoarkDbData> {
+		return joarkRepository.findById(id)
 	}
 
 	private fun createJoarkDbData(joarkData: JoarkData) =
-		JoarkDbData(UUID.randomUUID().toString(), joarkData.tema, joarkData.eksternReferanseId)
+		JoarkDbData(joarkData.eksternReferanseId, joarkData.tittel, joarkData.tema)
 }
