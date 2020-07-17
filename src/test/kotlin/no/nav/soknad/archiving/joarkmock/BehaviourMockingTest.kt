@@ -55,7 +55,7 @@ class BehaviourMockingTest {
 		val response = joarkRestInterface.receiveMessage(createRequestData(id))
 
 		assertEquals(HttpStatus.OK, response.statusCode)
-		assertEquals("THIS IS A MOCKED INVALID RESPONSE", response.body)
+		assertEquals("THIS_IS_A_MOCKED_INVALID_RESPONSE", response.body)
 
 		joarkRestInterface.lookup(id)
 
