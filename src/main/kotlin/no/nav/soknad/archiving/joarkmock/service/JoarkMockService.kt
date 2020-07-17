@@ -32,5 +32,5 @@ class JoarkMockService(private val joarkRepository: JoarkRepository, private val
 	}
 
 	private fun createJoarkDbData(joarkData: JoarkData) =
-		JoarkDbData(joarkData.eksternReferanseId, joarkData.tittel, joarkData.tema)
+		JoarkDbData(joarkData.eksternReferanseId, joarkData.tittel, joarkData.tema, LocalDateTime.now())
 }

@@ -5,12 +5,14 @@ import no.nav.soknad.archiving.dto.JoarkData
 import no.nav.soknad.archiving.joarkmock.rest.BehaviourMocking
 import no.nav.soknad.archiving.joarkmock.rest.JoarkRestInterface
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -27,6 +29,7 @@ class IntegrationTest {
 
 	@Test
 	fun `Will save to database when receiving message`() {
+		val timeWhenStarting = LocalDateTime.now().minusSeconds(1)
 		val id = UUID.randomUUID().toString()
 		behaviourMocking.setNormalResponseBehaviour(id)
 
@@ -36,6 +39,8 @@ class IntegrationTest {
 		assertEquals(id, result.id)
 		assertEquals(tema, result.tema)
 		assertEquals(title, result.title)
+		assertTrue(result.timesaved.isBefore(LocalDateTime.now().plusSeconds(1)))
+		assertTrue(result.timesaved.isAfter(timeWhenStarting))
 	}
 
 	@Test
