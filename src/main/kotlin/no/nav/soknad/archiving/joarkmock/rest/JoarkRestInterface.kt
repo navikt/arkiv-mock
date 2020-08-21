@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
-@RequestMapping("/joark")
+@RequestMapping("/rest/journalpostapi/v1")
 class JoarkRestInterface(private val joarkMockService: JoarkMockService) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
-	@PostMapping(value = ["/save"])
+	@PostMapping(value = ["/journalpost"])
 	fun receiveMessage(@RequestBody joarkData: JoarkData): ResponseEntity<String> {
 		logger.info("Received message: '$joarkData'")
 
