@@ -1,7 +1,7 @@
 package no.nav.soknad.archiving.joarkmock.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.soknad.archiving.dto.JoarkResponse
+import no.nav.soknad.archiving.dto.OpprettJournalpostResponse
 import no.nav.soknad.archiving.joarkmock.exceptions.InternalServerErrorException
 import no.nav.soknad.archiving.joarkmock.exceptions.NotFoundException
 import org.slf4j.LoggerFactory
@@ -53,7 +53,7 @@ class BehaviourService(val objectMapper: ObjectMapper) {
 		}
 	}
 
-	fun alterResponse(uuid: String, response: JoarkResponse): String {
+	fun alterResponse(uuid: String, response: OpprettJournalpostResponse): String? {
 		val jsonResponse = objectMapper.writeValueAsString(response)
 		if (!behaviours.containsKey(uuid)) {
 			logger.warn("For id=$uuid, have not registered a behaviour. Will return normal response.")
@@ -63,7 +63,7 @@ class BehaviourService(val objectMapper: ObjectMapper) {
 		val behaviour = behaviours[uuid]!!
 		return if (behaviour.behaviour == BEHAVIOUR.RESPOND_WITH_ERRONEOUS_BODY && behaviour.calls <= behaviour.forAttempts) {
 			logger.info("For id=$uuid, will return erroneous response.")
-			"THIS_IS_A_MOCKED_INVALID_RESPONSE"
+			return null
 		} else {
 			logger.info("For id=$uuid, will return normal response")
 			jsonResponse
