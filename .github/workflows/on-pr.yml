@@ -1,0 +1,76 @@
+name: Run end-to-end-tests on pull-requests
+
+on:
+  pull_request:
+
+jobs:
+  run-end-to-end-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read/save .m2 cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+
+      - name: 'Check out the code for this repo'
+        uses: actions/checkout@v2
+
+      - name: 'Check out the code for the tests'
+        uses: actions/checkout@v2
+        with:
+          repository: navikt/archiving-infrastructure
+          path: archiving-infrastructure
+
+      - name: 'Check out the code for soknadsarkiverer'
+        uses: actions/checkout@v2
+        with:
+          repository: navikt/soknadsarkiverer
+          path: soknadsarkiverer
+      - name: 'Build soknadsarkiverer'
+        run: |
+          cd soknadsarkiverer
+          mvn clean install -DskipTests
+          APP_NAME=$(echo $GITHUB_REPOSITORY | rev | cut -f1 -d"/" | rev )
+          IMAGE_BASE="docker.pkg.github.com/$GITHUB_REPOSITORY/$APP_NAME"
+          IMAGE_LATEST="$IMAGE_BASE:latest"
+          docker build --tag $IMAGE_LATEST .
+
+      - name: 'Check out the code for soknadsmottaker'
+        uses: actions/checkout@v2
+        with:
+          repository: navikt/soknadsmottaker
+          path: soknadsmottaker
+      - name: 'Build soknadsmottaker'
+        run: |
+          cd soknadsmottaker
+          mvn clean install -DskipTests
+          APP_NAME=$(echo $GITHUB_REPOSITORY | rev | cut -f1 -d"/" | rev )
+          IMAGE_BASE="docker.pkg.github.com/$GITHUB_REPOSITORY/$APP_NAME"
+          IMAGE_LATEST="$IMAGE_BASE:latest"
+          docker build --tag $IMAGE_LATEST .
+
+      - name: 'Check out the code for soknadsfillager'
+        uses: actions/checkout@v2
+        with:
+          repository: navikt/soknadsfillager
+          path: soknadsfillager
+      - name: 'Build soknadsfillager'
+        run: |
+          cd soknadsfillager
+          mvn clean install -DskipTests
+          APP_NAME=$(echo $GITHUB_REPOSITORY | rev | cut -f1 -d"/" | rev )
+          IMAGE_BASE="docker.pkg.github.com/$GITHUB_REPOSITORY/$APP_NAME"
+          IMAGE_LATEST="$IMAGE_BASE:latest"
+          docker build --tag $IMAGE_LATEST .
+
+
+      - name: 'Run end-to-end-tests'
+        run: |
+          cd archiving-infrastructure/end-to-end-tests
+          mvn clean install
