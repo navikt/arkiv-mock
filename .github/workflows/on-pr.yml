@@ -19,70 +19,32 @@ jobs:
           java-version: '11'
 
 
-      - name: 'Check out the code for this PR'
-        uses: actions/checkout@v2
+      - name: 'Build the code for this PR'
+        uses: navikt/archiving-infrastructure/gha/checkout-and-build@master
         with:
-          path: joark-mock
-      - name: 'Build joark-mock'
-        run: |
-          echo "${GITHUB_HEAD_REF}"
-          cd joark-mock
-          mvn clean install -DskipTests
-          APP_NAME=$(echo $(pwd) | rev | cut -f1 -d"/" | rev)
-          TAG="archiving-infrastructure_${APP_NAME}:latest"
-          docker build --tag $TAG .
-          cd -
+          component_name: joark-mock
+          branch: ${GITHUB_HEAD_REF}
 
-      - name: 'Check out the code for soknadsmottaker'
-        uses: actions/checkout@v2
+      - name: 'Build the code for soknadsmottaker'
+        uses: navikt/archiving-infrastructure/gha/checkout-and-build@master
         with:
-          repository: navikt/soknadsmottaker
-          path: soknadsmottaker
-      - name: 'Build soknadsmottaker'
-        run: |
-          cd soknadsmottaker
-          mvn clean install -DskipTests
-          APP_NAME=$(echo $(pwd) | rev | cut -f1 -d"/" | rev)
-          TAG="archiving-infrastructure_${APP_NAME}:latest"
-          docker build --tag $TAG .
-          cd -
+          component_name: soknadsmottaker
 
-      - name: 'Check out the code for soknadsfillager'
-        uses: actions/checkout@v2
+      - name: 'Build the code for soknadsfillager'
+        uses: navikt/archiving-infrastructure/gha/checkout-and-build@master
         with:
-          repository: navikt/soknadsfillager
-          path: soknadsfillager
-      - name: 'Build soknadsfillager'
-        run: |
-          cd soknadsfillager
-          mvn clean install -DskipTests
-          APP_NAME=$(echo $(pwd) | rev | cut -f1 -d"/" | rev)
-          TAG="archiving-infrastructure_${APP_NAME}:latest"
-          docker build --tag $TAG .
-          cd -
+          component_name: soknadsfillager
 
-      - name: 'Check out the code for soknadsarkiverer'
-        uses: actions/checkout@v2
+      - name: 'Build the code for soknadsarkiverer'
+        uses: navikt/archiving-infrastructure/gha/checkout-and-build@master
         with:
-          repository: navikt/soknadsarkiverer
-          path: soknadsarkiverer
-      - name: 'Build soknadsarkiverer'
-        run: |
-          cd soknadsarkiverer
-          mvn clean install -DskipTests
-          APP_NAME=$(echo $(pwd) | rev | cut -f1 -d"/" | rev)
-          TAG="archiving-infrastructure_${APP_NAME}:latest"
-          docker build --tag $TAG .
-          cd -
+          component_name: soknadsarkiverer
 
 
-      - name: 'Check out the code for the end-to-end-tests'
-        uses: actions/checkout@v2
+      - name: 'Run the end-to-end-tests'
+        uses: navikt/archiving-infrastructure/gha/checkout-and-build@master
         with:
-          repository: navikt/archiving-infrastructure
-          path: archiving-infrastructure
-      - name: 'Run end-to-end-tests'
-        run: |
-          cd archiving-infrastructure/end-to-end-tests
-          mvn clean install
-          cd -
+          component_name: archiving-infrastructure
+          sub_directory: end-to-end-tests
+          skip_tests: false
+          run_docker_build: false
