@@ -1,6 +1,7 @@
-CREATE TABLE joark (
-       id VARCHAR(255) PRIMARY KEY,
-       title VARCHAR(255),
-       tema VARCHAR(255),
-       timesaved TIMESTAMP
+CREATE TABLE archive
+(
+    id        VARCHAR(255) NOT NULL PRIMARY KEY,
+    title     VARCHAR(255) NOT NULL,
+    tema      VARCHAR(255) NOT NULL,
+    timesaved BIGINT
 );

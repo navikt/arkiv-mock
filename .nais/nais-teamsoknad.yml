@@ -1,0 +1,63 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: arkiv-mock
+  namespace: team-soknad
+  labels:
+    team: team-soknad
+spec:
+  image: {{image}}
+  port: 8090
+  liveness:
+    path: /internal/isAlive
+    initialDelay: 20
+    failureThreshold: 10
+    timeout: 1
+  readiness:
+    path: /internal/isReady
+    initialDelay: 20
+    timeout: 1
+  prometheus:
+    enabled: true
+    path: /internal/prometheus
+  replicas:
+    min: 2
+    max: 4
+  resources:
+    limits:
+      cpu: 3000m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  ingresses:
+    - "https://arkiv-mock.dev.adeo.no"
+  vault:
+    enabled: true
+    paths:
+      - mountPath: /var/run/secrets/nais.io/serviceuser
+        kvPath: /serviceuser/data/dev/srvarkivmock
+      - mountPath: /var/run/secrets/nais.io/kv
+        kvPath: /kv/preprod/fss/soknadsmottaker/default
+      - mountPath: /var/run/secrets/nais.io/appdynamics
+        kvPath: /apikey/appdynamics/dev
+
+  env:
+    - name: KAFKA_BOOTSTRAP_SERVERS
+      value: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
+    - name: KAFKA_SECURITY
+      value: 'TRUE'
+    - name: KAFKA_SECPROT
+      value: SASL_SSL
+    - name: KAFKA_SASLMEC
+      value: PLAIN
+    - name: DATABASE_PORT
+      value: "5432"
+    - name: DATABASE_HOST
+      value: b27dbvl026.preprod.local
+    - name: DATABASE_NAME
+      value: soknadsfillager-db-teamsoknad
+    - name: VAULT_DB_PATH
+      value: postgresql/preprod-fss
+    - name: APPLICATION_PROFILE
+      value: dev
