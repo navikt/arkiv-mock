@@ -1,6 +1,6 @@
 # arkiv-mock
 
-This component acts as a mock for Joark. It is intended to be used for end-to-end tests and not in production.
+This component acts as a mock for Joark. It is intended to be used for end-to-end and load tests, but not in production.
 
 The components' behaviour can be controlled, so that it can for instance respond with errors a certain amount of times.
 The component can also be queried about how many times calls were made to it.
