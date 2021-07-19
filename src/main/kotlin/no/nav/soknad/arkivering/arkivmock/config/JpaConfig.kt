@@ -21,8 +21,10 @@ class JpaConfig(private val appConfig: AppConfiguration) {
 		} else {
 			Database(appConfig.dbConfig, appConfig.dbConfig.credentialService)
 		}
+ 		appConfig.dbConfig.renewService.startRenewTasks(appConfig.applicationState)
+
 		appConfig.applicationState.ready = true
-		appConfig.dbConfig.renewService.startRenewTasks(appConfig.applicationState)
+		appConfig.applicationState.alive = true
 		logger.info("Datasource is initialised")
 		return database.dataSource
 	}

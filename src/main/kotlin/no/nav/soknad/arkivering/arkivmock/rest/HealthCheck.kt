@@ -10,16 +10,26 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping
-class HealthInterface(private val appConfiguration: AppConfiguration) {
+class HealthCheck(private val appConfiguration: AppConfiguration) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
 	@GetMapping(value = ["/isAlive"])
 	fun isAlive(): ResponseEntity<String> {
-		logger.info("/isAlive called")
-
 		return if (appConfiguration.applicationState.alive)
 			ResponseEntity("Application is alive!", HttpStatus.OK)
-		else
+		else {
+			logger.error("Application is NOT alive!")
 			ResponseEntity("Application is NOT alive!", HttpStatus.INTERNAL_SERVER_ERROR)
+		}
+	}
+
+	@GetMapping(value = ["/isReady"])
+	fun isReady(): ResponseEntity<String> {
+		return if (appConfiguration.applicationState.ready)
+			ResponseEntity("Application is ready!", HttpStatus.OK)
+		else {
+			logger.error("Application is NOT ready!")
+			ResponseEntity("Application is NOT ready!", HttpStatus.INTERNAL_SERVER_ERROR)
+		}
 	}
 }
