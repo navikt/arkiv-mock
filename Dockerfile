@@ -1,5 +1,7 @@
 FROM navikt/java:11
 
-COPY target/*.jar app.jar
+ENV APPLICATION_PROFILE=docker
+ENV KAFKA_BOOTSTRAP_SERVERS=kafka-broker:29092
 
-CMD java -jar app.jar
+COPY target/*.jar app.jar
+EXPOSE 8092
