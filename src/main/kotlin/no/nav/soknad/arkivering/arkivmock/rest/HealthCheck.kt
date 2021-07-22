@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 class HealthCheck(private val appConfiguration: AppConfiguration) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
-	@GetMapping(value = ["/isAlive"])
+	@GetMapping("/isAlive")
 	fun isAlive(): ResponseEntity<String> {
 		return if (appConfiguration.applicationState.alive)
 			ResponseEntity("Application is alive!", HttpStatus.OK)
@@ -23,13 +23,6 @@ class HealthCheck(private val appConfiguration: AppConfiguration) {
 		}
 	}
 
-	@GetMapping(value = ["/isReady"])
-	fun isReady(): ResponseEntity<String> {
-		return if (appConfiguration.applicationState.ready)
-			ResponseEntity("Application is ready!", HttpStatus.OK)
-		else {
-			logger.error("Application is NOT ready!")
-			ResponseEntity("Application is NOT ready!", HttpStatus.INTERNAL_SERVER_ERROR)
-		}
-	}
+	@GetMapping("/internal/isAlive")
+	fun isAliveInternal() = isAlive()
 }
