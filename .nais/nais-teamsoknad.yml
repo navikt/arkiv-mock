@@ -19,14 +19,16 @@ spec:
       cpu: 200m
       memory: 256Mi
   ingresses:
-    - "https://arkiv-mock.dev.adeo.no"
+    - "https://arkiv-mock.dev.intern.nav.no"
+  accessPolicy:
+    inbound:
+      rules:
+        - application: soknadsarkiverer
   vault:
     enabled: true
     paths:
       - mountPath: /var/run/secrets/nais.io/serviceuser
         kvPath: /serviceuser/data/dev/srvarkivmock
-      - mountPath: /var/run/secrets/nais.io/kv
-        kvPath: /kv/preprod/fss/arkivmock/default
       - mountPath: /var/run/secrets/nais.io/appdynamics
         kvPath: /apikey/appdynamics/dev
 
