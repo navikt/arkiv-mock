@@ -20,6 +20,7 @@
 		<flyway.version>7.11.1</flyway.version>
 		<vault-java-driver.version>5.1.0</vault-java-driver.version>
 
+		<logstash.version>6.6</logstash.version>
 		<konfig.version>1.6.10.0</konfig.version>
 		<coroutines.version>1.5.1</coroutines.version>
 		<mockito-kotlin.version>2.2.0</mockito-kotlin.version>
@@ -57,6 +58,12 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-kotlin</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>${logstash.version}</version>
 		</dependency>
 
 
