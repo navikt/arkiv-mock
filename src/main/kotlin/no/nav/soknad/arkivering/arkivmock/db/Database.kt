@@ -65,6 +65,7 @@ class Database(
 		} else {
 			logger.info("Database, runFlywayMigrations without setting role")
 		}
+		load().repair()
 		load().migrate()
 	}
 }

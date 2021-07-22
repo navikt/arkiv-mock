@@ -25,7 +25,7 @@ class EmbeddedDatabase(
 		get() = dataSource.connection
 
 	init {
-		logger.info("Init of embeddedPostres")
+		logger.info("Init of embeddedPostgres")
 		embeddedPostgres = EmbeddedPostgres.builder().start()
 		postgresConnection = embeddedPostgres.postgresDatabase.connection
 		val hikariConfig = createHikariConfig()
@@ -63,6 +63,7 @@ class EmbeddedDatabase(
 		config.username = credentials.username
 		config.password = credentials.password
 		dataSource(HikariDataSource(config))
+		load().repair()
 		load().migrate()
 	}
 }

@@ -13,3 +13,8 @@ management:
     export:
       prometheus:
         enabled: true
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
