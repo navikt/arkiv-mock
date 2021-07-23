@@ -26,6 +26,8 @@ private val defaultProperties = ConfigurationMap(
 		"VAULT_DB_PATH" to "",
 		"DATABASE_JDBC_URL" to "",
 
+		"REST_USERNAME" to "arkiv-mock",
+		"REST_PASSWORD" to "password",
 		"APPLICATION_PROFILE" to "spring",
 	)
 )
@@ -40,7 +42,7 @@ private fun String.configProperty(): String = appConfig[Key(this, stringType)]
 
 fun readFileAsText(fileName: String, default: String) = try { File(fileName).readText(Charsets.UTF_8) } catch (e: Exception ) { default }
 
-data class AppConfiguration(val kafkaConfig: KafkaConfig = KafkaConfig(), val dbConfig: DBConfig = DBConfig()) {
+data class AppConfiguration(val kafkaConfig: KafkaConfig = KafkaConfig(), val dbConfig: DBConfig = DBConfig(), val restConfig: RestConfig = RestConfig()) {
 	val applicationState = ApplicationState()
 
 	data class KafkaConfig(
@@ -70,6 +72,11 @@ data class AppConfiguration(val kafkaConfig: KafkaConfig = KafkaConfig(), val db
 		val useVault: Boolean = profiles == "dev" || profiles == "prod",
 		val credentialService: CredentialService = if (useVault) VaultCredentialService() else EmbeddedCredentialService(),
 		val renewService: RenewService = if (useVault) RenewVaultService(credentialService) else EmbeddedRenewService(credentialService)
+	)
+
+	data class RestConfig(
+		val username: String = readFileAsText("/var/run/secrets/nais.io/kv/restUser", "REST_USERNAME".configProperty()),
+		val password: String = readFileAsText("/var/run/secrets/nais.io/kv/restPassword", "REST_PASSWORD".configProperty())
 	)
 }
 
