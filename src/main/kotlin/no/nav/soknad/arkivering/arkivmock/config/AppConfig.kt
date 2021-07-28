@@ -68,8 +68,8 @@ data class AppConfiguration(val kafkaConfig: KafkaConfig = KafkaConfig(), val db
 			requireNotNull("DATABASE_HOST".configProperty()) { "database host must be set if jdbc url is not provided" },
 			requireNotNull("DATABASE_PORT".configProperty()) { "database port must be set if jdbc url is not provided" },
 			requireNotNull("DATABASE_NAME".configProperty()) { "database name must be set if jdbc url is not provided" }),
-		val embedded: Boolean = "spring" == profiles,
-		val useVault: Boolean = profiles == "dev" || profiles == "prod",
+		val embedded: Boolean = true,
+		val useVault: Boolean = false,
 		val credentialService: CredentialService = if (useVault) VaultCredentialService() else EmbeddedCredentialService(),
 		val renewService: RenewService = if (useVault) RenewVaultService(credentialService) else EmbeddedRenewService(credentialService)
 	)
