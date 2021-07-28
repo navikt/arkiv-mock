@@ -18,3 +18,31 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test | spring | default | docker
+
+no.nav.security.jwt:
+  issuer:
+    azuread:
+      discoveryurl: https://localhost/metadata
+      accepted_audience: aud-localhost
+      cookie_name: localhost-idtoken
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+no.nav.security.jwt:
+  expirythreshold: ${EXPIRYTHRESHOLD} #threshold in minutes until token expires
+
+  issuer.azuread:
+    discoveryurl: ${AZURE_WELL_KNOWN_URL}
+    accepted_audience: ${ACCEPTEDAUDIENCE}, api://${ACCEPTEDAUDIENCE}
+    proxyurl: http://webproxy-nais.nav.no:8088
+    cookie_name: azure_token
