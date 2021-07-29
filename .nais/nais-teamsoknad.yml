@@ -58,5 +58,5 @@ spec:
     - name: ACCEPTEDAUDIENCE
       value: 7b9e459e-225f-4fa8-b79f-2a15b993dae8
     - name: EXPIRYTHRESHOLD
-      value: 1
+      value: "1"
 
