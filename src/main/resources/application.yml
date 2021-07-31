@@ -27,7 +27,7 @@ spring:
 
 no.nav.security.jwt:
   issuer:
-    azuread:
+    isso:
       discoveryurl: https://localhost/metadata
       accepted_audience: aud-localhost
       cookie_name: localhost-idtoken
@@ -41,8 +41,7 @@ spring:
 no.nav.security.jwt:
   expirythreshold: ${EXPIRYTHRESHOLD} #threshold in minutes until token expires
 
-  issuer.azuread:
-    discoveryurl: ${AZURE_WELL_KNOWN_URL}
+  issuer.isso:
+    discoveryurl: ${ISSO_WELL_KNOWN_URL}
     accepted_audience: ${ACCEPTEDAUDIENCE}, api://${ACCEPTEDAUDIENCE}
-    proxyurl: http://webproxy-nais.nav.no:8088
-    cookie_name: azure_token
+    cookie_name: isso_token

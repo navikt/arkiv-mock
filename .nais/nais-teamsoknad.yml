@@ -53,8 +53,8 @@ spec:
       value: postgresql/preprod-fss
     - name: APPLICATION_PROFILE
       value: dev
-    - name: AZURE_WELL_KNOWN_URL
-      value: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
+    - name: ISSO_WELL_KNOWN_URL
+      value: https://security-token-service.nais.preprod.local/rest/v1/sts/.well-known/openid-configuration
     - name: ACCEPTEDAUDIENCE
       value: 7b9e459e-225f-4fa8-b79f-2a15b993dae8
     - name: EXPIRYTHRESHOLD
