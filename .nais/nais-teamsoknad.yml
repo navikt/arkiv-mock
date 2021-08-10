@@ -7,7 +7,7 @@ metadata:
     team: team-soknad
 spec:
   image: {{image}}
-  port: 8090
+  port: 8092
   replicas:
     min: 2
     max: 4
@@ -53,3 +53,10 @@ spec:
       value: postgresql/preprod-fss
     - name: APPLICATION_PROFILE
       value: dev
+    - name: ISSO_WELL_KNOWN_URL
+      value: https://security-token-service.nais.preprod.local/rest/v1/sts/.well-known/openid-configuration
+    - name: ACCEPTEDAUDIENCE
+      value: 7b9e459e-225f-4fa8-b79f-2a15b993dae8
+    - name: EXPIRYTHRESHOLD
+      value: "1"
+

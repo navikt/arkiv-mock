@@ -1,5 +1,6 @@
 package no.nav.soknad.arkivering.arkivmock.rest
 
+import no.nav.security.token.support.core.api.Unprotected
 import no.nav.soknad.arkivering.arkivmock.config.AppConfiguration
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping
+@Unprotected
 class HealthCheck(private val appConfiguration: AppConfiguration) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
