@@ -1,13 +1,13 @@
 package no.nav.soknad.arkivering.arkivmock.rest
 
+import no.nav.security.token.support.core.api.Protected
+import no.nav.security.token.support.core.api.Unprotected
 import no.nav.soknad.arkivering.arkivmock.dto.ArkivData
 import no.nav.soknad.arkivering.arkivmock.service.ArkivMockService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import no.nav.security.token.support.core.api.Protected
-import no.nav.security.token.support.core.api.Unprotected
 
 @RestController
 @RequestMapping("/rest/journalpostapi/v1")
