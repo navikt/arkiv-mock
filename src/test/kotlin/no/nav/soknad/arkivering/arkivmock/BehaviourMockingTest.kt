@@ -55,7 +55,7 @@ class BehaviourMockingTest {
 	@Test
 	fun `No specified mock behaviour - Will save to DB`() {
 		val dbCountBefore = arkivRepository.count().toInt()
-		val response = arkivRestInterface.receiveMessage(createRequestData(id))
+		val response = arkivRestInterface.receiveMessage(UUID.randomUUID().toString(), createRequestData(id))
 
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertTrue(response.body!!.contains("{\"dokumenter\":[],\"journalpostId\":\""))
@@ -72,7 +72,7 @@ class BehaviourMockingTest {
 		val dbCountBefore = arkivRepository.count().toInt()
 		behaviourMocking.mockOkResponseWithErroneousBody(id, 1)
 
-		val response = arkivRestInterface.receiveMessage(createRequestData(id))
+		val response = arkivRestInterface.receiveMessage(UUID.randomUUID().toString(), createRequestData(id))
 
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals("THIS_IS_A_MOCKED_INVALID_RESPONSE", response.body)
@@ -89,14 +89,14 @@ class BehaviourMockingTest {
 		behaviourMocking.mockResponseBehaviour(id, 404, 2)
 
 		assertThrows<NotFoundException> {
-			arkivRestInterface.receiveMessage(createRequestData(id))
+			arkivRestInterface.receiveMessage(UUID.randomUUID().toString(), createRequestData(id))
 		}
 
 		assertThrows<NotFoundException> {
-			arkivRestInterface.receiveMessage(createRequestData(id))
+			arkivRestInterface.receiveMessage(UUID.randomUUID().toString(), createRequestData(id))
 		}
 
-		val response = arkivRestInterface.receiveMessage(createRequestData(id))
+		val response = arkivRestInterface.receiveMessage(UUID.randomUUID().toString(), createRequestData(id))
 
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals(3, behaviourMocking.getNumberOfCalls(id))
@@ -112,18 +112,18 @@ class BehaviourMockingTest {
 		behaviourMocking.mockResponseBehaviour(id, 500, 3)
 
 		assertThrows<InternalServerErrorException> {
-			arkivRestInterface.receiveMessage(createRequestData(id))
+			arkivRestInterface.receiveMessage(UUID.randomUUID().toString(), createRequestData(id))
 		}
 
 		assertThrows<InternalServerErrorException> {
-			arkivRestInterface.receiveMessage(createRequestData(id))
+			arkivRestInterface.receiveMessage(UUID.randomUUID().toString(), createRequestData(id))
 		}
 
 		assertThrows<InternalServerErrorException> {
-			arkivRestInterface.receiveMessage(createRequestData(id))
+			arkivRestInterface.receiveMessage(UUID.randomUUID().toString(), createRequestData(id))
 		}
 
-		val response = arkivRestInterface.receiveMessage(createRequestData(id))
+		val response = arkivRestInterface.receiveMessage(UUID.randomUUID().toString(), createRequestData(id))
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals(4, behaviourMocking.getNumberOfCalls(id))
 		TimeUnit.SECONDS.sleep(1)

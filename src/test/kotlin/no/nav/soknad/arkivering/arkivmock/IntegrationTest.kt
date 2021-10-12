@@ -35,7 +35,7 @@ class IntegrationTest {
 		val id = UUID.randomUUID().toString()
 		behaviourMocking.setNormalResponseBehaviour(id)
 
-		arkivRestInterface.receiveMessage(createRequestData(id))
+		arkivRestInterface.receiveMessage(UUID.randomUUID().toString(), createRequestData(id))
 
 		val res = arkivRepository.findById(id)
 		assertTrue(res.isPresent)

@@ -24,7 +24,7 @@ class ArkivMockService(
 		arkivRepository.deleteAll()
 	}
 
-	fun archive(arkivData: ArkivData): String? {
+	fun archive(key: String, arkivData: ArkivData): String? {
 		reactToArchiveRequest(arkivData)
 
 		val data = createArkivDbData(arkivData)
