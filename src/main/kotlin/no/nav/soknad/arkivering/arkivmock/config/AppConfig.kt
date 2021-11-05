@@ -75,8 +75,8 @@ data class AppConfiguration(val kafkaConfig: KafkaConfig = KafkaConfig(), val db
 	)
 
 	data class RestConfig(
-		val username: String = readFileAsText("/var/run/secrets/nais.io/kv/restUser", "BASICAUTH_USERNAME".configProperty()),
-		val password: String = readFileAsText("/var/run/secrets/nais.io/kv/restPassword", "BASICAUTH_PASSWORD".configProperty())
+		val username: String = readFileAsText("/secrets/innsending-data/username", "BASICAUTH_USERNAME".configProperty()),
+		val password: String = readFileAsText("/secrets/innsending-data/password", "BASICAUTH_PASSWORD".configProperty())
 	)
 }
 

@@ -29,8 +29,8 @@ spec:
     paths:
       - mountPath: /var/run/secrets/nais.io/serviceuser
         kvPath: /serviceuser/data/dev/srvarkivmock
-      - mountPath: /var/run/secrets/nais.io/kv
-        kvPath: /kv/preprod/fss/arkiv-mock/default
+      - mountPath: /secrets/innsending-data
+        kvPath: secret/team-soknad/innsending/basicauth
       - mountPath: /var/run/secrets/nais.io/appdynamics
         kvPath: /apikey/appdynamics/dev
 
