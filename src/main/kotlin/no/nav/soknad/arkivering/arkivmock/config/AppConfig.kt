@@ -12,7 +12,6 @@ private val defaultProperties = ConfigurationMap(
 		"KAFKA_BOOTSTRAP_SERVERS" to "localhost:9092",
 		"NUMBER_OF_CALLS_TOPIC" to "privat-soknadInnsendt-endToEndTests-numberOfCalls",
 		"ENTITIES_TOPIC" to "privat-soknadInnsendt-endToEndTests-entities",
-		"NUMBER_OF_ENTITIES_TOPIC" to "privat-soknadInnsendt-endToEndTests-numberOfEntities",
 
 		"KAFKA_USERNAME" to "arkiv-mock",
 		"KAFKA_PASSWORD" to "",
@@ -54,7 +53,6 @@ data class AppConfiguration(val kafkaConfig: KafkaConfig = KafkaConfig(), val db
 
 		val numberOfCallsTopic: String = "NUMBER_OF_CALLS_TOPIC".configProperty(),
 		val entitiesTopic: String = "ENTITIES_TOPIC".configProperty(),
-		val numberOfEntitiesTopic: String = "NUMBER_OF_ENTITIES_TOPIC".configProperty(),
 	)
 
 	data class DBConfig(
