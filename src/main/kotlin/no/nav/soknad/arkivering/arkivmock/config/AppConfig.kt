@@ -14,8 +14,8 @@ private val defaultProperties = ConfigurationMap(
 		"ENTITIES_TOPIC" to "privat-soknadInnsendt-endToEndTests-entities",
 		"NUMBER_OF_ENTITIES_TOPIC" to "privat-soknadInnsendt-endToEndTests-numberOfEntities",
 
-		"USERNAME" to "arkiv-mock",
-		"PASSWORD" to "",
+		"KAFKA_USERNAME" to "arkiv-mock",
+		"KAFKA_PASSWORD" to "",
 		"KAFKA_SECURITY" to "",
 		"KAFKA_SECPROT" to "",
 		"KAFKA_SASLMEC" to "",
@@ -26,8 +26,8 @@ private val defaultProperties = ConfigurationMap(
 		"VAULT_DB_PATH" to "",
 		"DATABASE_JDBC_URL" to "",
 
-		"REST_USERNAME" to "arkiv-mock",
-		"REST_PASSWORD" to "password",
+		"BASICAUTH_USERNAME" to "sender",
+		"BASICAUTH_PASSWORD" to "password",
 		"APPLICATION_PROFILE" to "spring",
 	)
 )
@@ -46,8 +46,8 @@ data class AppConfiguration(val kafkaConfig: KafkaConfig = KafkaConfig(), val db
 	val applicationState = ApplicationState()
 
 	data class KafkaConfig(
-		val username: String = readFileAsText("/var/run/secrets/nais.io/serviceuser/username", "USERNAME".configProperty()),
-		val password: String = readFileAsText("/var/run/secrets/nais.io/serviceuser/password", "PASSWORD".configProperty()),
+		val username: String = readFileAsText("/var/run/secrets/nais.io/serviceuser/username", "KAFKA_USERNAME".configProperty()),
+		val password: String = readFileAsText("/var/run/secrets/nais.io/serviceuser/password", "KAFKA_PASSWORD".configProperty()),
 		val servers: String = readFileAsText("/var/run/secrets/nais.io/kv/kafkaBootstrapServers", "KAFKA_BOOTSTRAP_SERVERS".configProperty()),
 		val secure: String = "KAFKA_SECURITY".configProperty(),
 		val protocol: String = "KAFKA_SECPROT".configProperty(), // SASL_PLAINTEXT | SASL_SSL
@@ -75,8 +75,8 @@ data class AppConfiguration(val kafkaConfig: KafkaConfig = KafkaConfig(), val db
 	)
 
 	data class RestConfig(
-		val username: String = readFileAsText("/var/run/secrets/nais.io/kv/restUser", "REST_USERNAME".configProperty()),
-		val password: String = readFileAsText("/var/run/secrets/nais.io/kv/restPassword", "REST_PASSWORD".configProperty())
+		val username: String = readFileAsText("/var/run/secrets/nais.io/kv/restUser", "BASICAUTH_USERNAME".configProperty()),
+		val password: String = readFileAsText("/var/run/secrets/nais.io/kv/restPassword", "BASICAUTH_PASSWORD".configProperty())
 	)
 }
 
