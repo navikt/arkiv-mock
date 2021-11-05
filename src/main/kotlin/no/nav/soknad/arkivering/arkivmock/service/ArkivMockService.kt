@@ -66,7 +66,6 @@ class ArkivMockService(
 		val dbEntity = arkivRepository.save(data)
 		try {
 			kafkaPublisher.putDataOnTopic(key, dbEntity)
-			kafkaPublisher.putNumberOfEntitiesOnTopic(key, arkivRepository.count().toInt())
 		} catch (e: Exception) {
 			logger.error("$key: Failed to publish data and/or number of entries to Kafka topic!", e)
 		}

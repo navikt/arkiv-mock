@@ -38,12 +38,6 @@ class KafkaPublisher(private val appConfiguration: AppConfiguration) {
 		putDataOnTopic(key, value, headers, topic, kafkaProducer)
 	}
 
-	fun putNumberOfEntitiesOnTopic(key: String, value: Int, headers: Headers = RecordHeaders()) {
-		val topic = appConfiguration.kafkaConfig.numberOfEntitiesTopic
-		val kafkaProducer = kafkaIntProducer
-		putDataOnTopic(key, value, headers, topic, kafkaProducer)
-	}
-
 	private fun <T> putDataOnTopic(
 		key: String?, value: T, headers: Headers, topic: String,
 		kafkaProducer: KafkaProducer<String, T>
@@ -53,7 +47,7 @@ class KafkaPublisher(private val appConfiguration: AppConfiguration) {
 		headers.add("MESSAGE_ID", UUID.randomUUID().toString().toByteArray())
 		headers.forEach { h -> producerRecord.headers().add(h) }
 
-		logger.info("Publishing to topic '$topic' with key $key: '$value'")
+		logger.info("$key: Publishing to topic '$topic' with key: '$key', value: '$value'")
 
 		return kafkaProducer
 			.send(producerRecord)
