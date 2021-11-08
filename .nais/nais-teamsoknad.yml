@@ -29,8 +29,6 @@ spec:
     paths:
       - mountPath: /var/run/secrets/nais.io/serviceuser
         kvPath: /serviceuser/data/dev/srvarkivmock
-      - mountPath: /var/run/secrets/nais.io/kv
-        kvPath: /kv/preprod/fss/arkiv-mock/default
 
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS
