@@ -67,7 +67,7 @@ class ArkivMockService(
 		try {
 			kafkaPublisher.putDataOnTopic(key, dbEntity)
 		} catch (e: Exception) {
-			logger.error("$key: Failed to publish data and/or number of entries to Kafka topic!", e)
+			logger.error("$key: Failed to publish data to Kafka topic!", e)
 		}
 	}
 }
