@@ -10,8 +10,8 @@ import java.io.File
 private val defaultProperties = ConfigurationMap(
 	mapOf(
 		"KAFKA_BOOTSTRAP_SERVERS" to "localhost:9092",
-		"NUMBER_OF_CALLS_TOPIC" to "privat-soknadInnsendt-endToEndTests-numberOfCalls",
-		"ENTITIES_TOPIC" to "privat-soknadInnsendt-endToEndTests-entities",
+		"NUMBER_OF_CALLS_TOPIC" to "privat-soknadInnsendt-systemTests-numberOfCalls",
+		"ENTITIES_TOPIC" to "privat-soknadInnsendt-systemTests-entities",
 
 		"KAFKA_USERNAME" to "arkiv-mock",
 		"KAFKA_PASSWORD" to "",
