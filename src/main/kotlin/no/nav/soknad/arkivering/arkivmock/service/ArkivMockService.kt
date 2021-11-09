@@ -30,7 +30,7 @@ class ArkivMockService(
 		val data = createArkivDbData(key, arkivData)
 		saveToDatabaseAndAlertOnKafka(key, data)
 
-		val response = createResponse(arkivData, data)
+		val response = createResponse(arkivData)
 		return behaviourService.alterResponse(key, response)
 	}
 
@@ -48,9 +48,10 @@ class ArkivMockService(
 		}
 	}
 
-	private fun createResponse(arkivData: ArkivData, data: ArkivDbData): OpprettJournalpostResponse {
+	private fun createResponse(arkivData: ArkivData): OpprettJournalpostResponse {
 		val dokumenter = arkivData.dokumenter.map { Dokumenter(it.brevkode, UUID.randomUUID().toString(), it.tittel) }
-		return OpprettJournalpostResponse(dokumenter, data.id, true, "MIDLERTIDIG", "null")
+		val id = arkivData.eksternReferanseId.reversed() // Simulate that Joark returns a different ID than the external one by reversing
+		return OpprettJournalpostResponse(dokumenter, id, true, "MIDLERTIDIG", "null")
 	}
 
 	private fun createArkivDbData(key: String, arkivData: ArkivData): ArkivDbData {
