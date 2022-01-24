@@ -5,11 +5,13 @@ import no.nav.soknad.arkivering.arkivmock.dto.Bruker
 import no.nav.soknad.arkivering.arkivmock.repository.ArkivRepository
 import no.nav.soknad.arkivering.arkivmock.rest.ArkivRestInterface
 import no.nav.soknad.arkivering.arkivmock.rest.BehaviourMocking
+import no.nav.soknad.arkivering.arkivmock.service.kafka.KafkaPublisher
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -22,12 +24,13 @@ class IntegrationTest {
 
 	@Autowired
 	private lateinit var arkivRestInterface: ArkivRestInterface
-
 	@Autowired
 	private lateinit var arkivRepository: ArkivRepository
-
 	@Autowired
 	private lateinit var behaviourMocking: BehaviourMocking
+	@Suppress("unused")
+	@MockBean
+	private lateinit var kafkaPublisher: KafkaPublisher
 
 	@Test
 	fun `Will save to database when receiving message and can reset afterwards`() {
@@ -35,7 +38,7 @@ class IntegrationTest {
 		val id = UUID.randomUUID().toString()
 		behaviourMocking.setNormalResponseBehaviour(id)
 
-		arkivRestInterface.receiveMessage(UUID.randomUUID().toString(), createRequestData(id))
+		arkivRestInterface.receiveJournalpost(createRequestData(id))
 
 		val res = arkivRepository.findById(id)
 		assertTrue(res.isPresent)

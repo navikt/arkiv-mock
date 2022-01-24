@@ -11,48 +11,48 @@ import org.springframework.web.bind.annotation.*
 class BehaviourMocking(val behaviourService: BehaviourService) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
-	@PutMapping("/mock-response/{uuid}/{statusCode}/{forAttempts}")
+	@PutMapping("/mock-response/{key}/{statusCode}/{forAttempts}")
 	fun mockResponseBehaviour(
-		@PathVariable("uuid") uuid: String,
+		@PathVariable("key") key: String,
 		@PathVariable("statusCode") statusCode: Int,
 		@PathVariable("forAttempts") forAttempts: Int
 	): ResponseEntity<String> {
-		logger.info("For id=$uuid, http status code $statusCode will be returned $forAttempts times")
+		logger.debug("$key: http status code $statusCode will be returned $forAttempts times")
 
-		behaviourService.mockException(uuid, statusCode, forAttempts)
+		behaviourService.mockException(key, statusCode, forAttempts)
 
 		return ResponseEntity("", HttpStatus.OK)
 	}
 
-	@PutMapping("/set-status-ok-with-erroneous-body/{uuid}/{forAttempts}")
+	@PutMapping("/set-status-ok-with-erroneous-body/{key}/{forAttempts}")
 	fun mockOkResponseWithErroneousBody(
-		@PathVariable("uuid") uuid: String,
+		@PathVariable("key") key: String,
 		@PathVariable("forAttempts") forAttempts: Int
 	): ResponseEntity<String> {
-		logger.info("For id=$uuid, http status code ${HttpStatus.OK}, but with erroneous body will be returned $forAttempts times")
+		logger.debug("$key: http status code ${HttpStatus.OK}, but with erroneous body will be returned $forAttempts times")
 
-		behaviourService.mockResponseWithErroneousBody(uuid, forAttempts)
-
-		return ResponseEntity("", HttpStatus.OK)
-	}
-
-	@PutMapping("/set-normal-behaviour/{uuid}")
-	fun setNormalResponseBehaviour(@PathVariable("uuid") uuid: String): ResponseEntity<String> {
-		logger.info("For id=$uuid, will accept all calls and return http status ${HttpStatus.OK}")
-
-		behaviourService.setNormalBehaviour(uuid)
+		behaviourService.mockResponseWithErroneousBody(key, forAttempts)
 
 		return ResponseEntity("", HttpStatus.OK)
 	}
 
-	@PutMapping("/reset/{uuid}")
-	fun resetMockResponseBehaviour(@PathVariable("uuid") uuid: String) = setNormalResponseBehaviour(uuid)
+	@PutMapping("/set-normal-behaviour/{key}")
+	fun setNormalResponseBehaviour(@PathVariable("key") key: String): ResponseEntity<String> {
+		logger.debug("$key: will accept all calls and return http status ${HttpStatus.OK}")
 
-	@GetMapping("/number-of-calls/{uuid}")
-	fun getNumberOfCalls(@PathVariable("uuid") uuid: String): Int {
-		val numberOfCallsThatHaveBeenMade = behaviourService.getNumberOfCallsThatHaveBeenMade(uuid)
+		behaviourService.setNormalBehaviour(key)
 
-		logger.info("For id=$uuid, there have been made $numberOfCallsThatHaveBeenMade calls to save to the archive")
+		return ResponseEntity("", HttpStatus.OK)
+	}
+
+	@PutMapping("/reset/{key}")
+	fun resetMockResponseBehaviour(@PathVariable("key") key: String) = setNormalResponseBehaviour(key)
+
+	@GetMapping("/number-of-calls/{key}")
+	fun getNumberOfCalls(@PathVariable("key") key: String): Int {
+		val numberOfCallsThatHaveBeenMade = behaviourService.getNumberOfCallsThatHaveBeenMade(key)
+
+		logger.info("$key: There have been made $numberOfCallsThatHaveBeenMade calls to save to the archive for this key")
 
 		return numberOfCallsThatHaveBeenMade
 	}

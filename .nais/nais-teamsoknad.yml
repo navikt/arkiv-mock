@@ -29,10 +29,6 @@ spec:
     paths:
       - mountPath: /var/run/secrets/nais.io/serviceuser
         kvPath: /serviceuser/data/dev/srvarkivmock
-      - mountPath: /secrets/innsending-data
-        kvPath: secret/team-soknad/innsending/basicauth
-      - mountPath: /var/run/secrets/nais.io/appdynamics
-        kvPath: /apikey/appdynamics/dev
 
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS
@@ -59,4 +55,3 @@ spec:
       value: 7b9e459e-225f-4fa8-b79f-2a15b993dae8
     - name: EXPIRYTHRESHOLD
       value: "1"
-
