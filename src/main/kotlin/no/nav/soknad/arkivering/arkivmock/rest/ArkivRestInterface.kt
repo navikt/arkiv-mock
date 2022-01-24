@@ -16,13 +16,10 @@ class ArkivRestInterface(private val arkivMockService: ArkivMockService) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
 	@PostMapping(value = ["/journalpost"])
-	fun receiveJournalpost(
-		@RequestHeader("innsendingKey") innsendingKey: String?,
-		@RequestBody arkivData: ArkivData
-	): ResponseEntity<String> {
+	fun receiveJournalpost(@RequestBody arkivData: ArkivData): ResponseEntity<String> {
 
-		val key = innsendingKey ?: "null"
-		logger.info("$key: Received message with id '${arkivData.eksternReferanseId}'")
+		val key = arkivData.eksternReferanseId
+		logger.info("$key: Received journalpost")
 
 		val responseBody = arkivMockService.archive(key, arkivData)
 		return ResponseEntity(responseBody, HttpStatus.OK)

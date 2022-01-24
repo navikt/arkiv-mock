@@ -10,8 +10,8 @@ import java.io.File
 private val defaultProperties = ConfigurationMap(
 	mapOf(
 		"KAFKA_BOOTSTRAP_SERVERS" to "localhost:9092",
-		"NUMBER_OF_CALLS_TOPIC" to "privat-soknadInnsendt-endToEndTests-numberOfCalls",
-		"ENTITIES_TOPIC" to "privat-soknadInnsendt-endToEndTests-entities",
+		"NUMBER_OF_CALLS_TOPIC" to "privat-soknadInnsendt-systemTests-numberOfCalls",
+		"ENTITIES_TOPIC" to "privat-soknadInnsendt-systemTests-entities",
 
 		"KAFKA_USERNAME" to "arkiv-mock",
 		"KAFKA_PASSWORD" to "",
@@ -25,8 +25,6 @@ private val defaultProperties = ConfigurationMap(
 		"VAULT_DB_PATH" to "",
 		"DATABASE_JDBC_URL" to "",
 
-		"BASICAUTH_USERNAME" to "sender",
-		"BASICAUTH_PASSWORD" to "password",
 		"APPLICATION_PROFILE" to "spring",
 	)
 )
@@ -41,7 +39,7 @@ private fun String.configProperty(): String = appConfig[Key(this, stringType)]
 
 fun readFileAsText(fileName: String, default: String) = try { File(fileName).readText(Charsets.UTF_8) } catch (e: Exception ) { default }
 
-data class AppConfiguration(val kafkaConfig: KafkaConfig = KafkaConfig(), val dbConfig: DBConfig = DBConfig(), val restConfig: RestConfig = RestConfig()) {
+data class AppConfiguration(val kafkaConfig: KafkaConfig = KafkaConfig(), val dbConfig: DBConfig = DBConfig()) {
 	val applicationState = ApplicationState()
 
 	data class KafkaConfig(
@@ -66,15 +64,10 @@ data class AppConfiguration(val kafkaConfig: KafkaConfig = KafkaConfig(), val db
 			requireNotNull("DATABASE_HOST".configProperty()) { "database host must be set if jdbc url is not provided" },
 			requireNotNull("DATABASE_PORT".configProperty()) { "database port must be set if jdbc url is not provided" },
 			requireNotNull("DATABASE_NAME".configProperty()) { "database name must be set if jdbc url is not provided" }),
-		val embedded: Boolean = "spring" == profiles,
+		val embedded: Boolean = profiles == "spring",
 		val useVault: Boolean = profiles == "dev",
 		val credentialService: CredentialService = if (useVault) VaultCredentialService() else EmbeddedCredentialService(),
 		val renewService: RenewService = if (useVault) RenewVaultService(credentialService) else EmbeddedRenewService(credentialService)
-	)
-
-	data class RestConfig(
-		val username: String = readFileAsText("/secrets/innsending-data/username", "BASICAUTH_USERNAME".configProperty()),
-		val password: String = readFileAsText("/secrets/innsending-data/password", "BASICAUTH_PASSWORD".configProperty())
 	)
 }
 
