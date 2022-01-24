@@ -5,7 +5,6 @@ import no.nav.soknad.arkivering.arkivmock.dto.ArkivData
 import no.nav.soknad.arkivering.arkivmock.dto.Bruker
 import no.nav.soknad.arkivering.arkivmock.exceptions.InternalServerErrorException
 import no.nav.soknad.arkivering.arkivmock.exceptions.NotFoundException
-import no.nav.soknad.arkivering.arkivmock.repository.ArkivRepository
 import no.nav.soknad.arkivering.arkivmock.rest.ArkivRestInterface
 import no.nav.soknad.arkivering.arkivmock.rest.BehaviourMocking
 import no.nav.soknad.arkivering.arkivmock.service.kafka.KafkaPublisher
@@ -29,13 +28,8 @@ class BehaviourMockingTest {
 
 	@Autowired
 	private lateinit var arkivRestInterface: ArkivRestInterface
-
 	@Autowired
 	private lateinit var behaviourMocking: BehaviourMocking
-
-	@Autowired
-	private lateinit var arkivRepository: ArkivRepository
-
 	@MockBean
 	private lateinit var kafkaPublisher: KafkaPublisher
 
@@ -54,8 +48,7 @@ class BehaviourMockingTest {
 
 	@Test
 	fun `No specified mock behaviour - Will save to DB`() {
-		val dbCountBefore = arkivRepository.count().toInt()
-		val response = arkivRestInterface.receiveMessage(id, createRequestData(id))
+		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
 
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertTrue(response.body!!.contains("{\"dokumenter\":[],\"journalpostId\":\""))
@@ -64,15 +57,13 @@ class BehaviourMockingTest {
 		TimeUnit.SECONDS.sleep(1)
 		verify(kafkaPublisher, times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
 		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), any(), any())
-		verify(kafkaPublisher, times(1)).putNumberOfEntitiesOnTopic(eq(id), eq(dbCountBefore + 1), any())
 	}
 
 	@Test
 	fun `Mock response with Ok Status but wrong body - Will save to DB`() {
-		val dbCountBefore = arkivRepository.count().toInt()
 		behaviourMocking.mockOkResponseWithErroneousBody(id, 1)
 
-		val response = arkivRestInterface.receiveMessage(id, createRequestData(id))
+		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
 
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals("THIS_IS_A_MOCKED_INVALID_RESPONSE", response.body)
@@ -80,56 +71,51 @@ class BehaviourMockingTest {
 		TimeUnit.SECONDS.sleep(1)
 		verify(kafkaPublisher, times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
 		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), any(), any())
-		verify(kafkaPublisher, times(1)).putNumberOfEntitiesOnTopic(eq(id), eq(dbCountBefore + 1), any())
 	}
 
 	@Test
 	fun `Responds with status 404 two times, third time works - Will save to DB on third attempt`() {
-		val dbCountBefore = arkivRepository.count().toInt()
 		behaviourMocking.mockResponseBehaviour(id, 404, 2)
 
 		assertThrows<NotFoundException> {
-			arkivRestInterface.receiveMessage(id, createRequestData(id))
+			arkivRestInterface.receiveJournalpost(createRequestData(id))
 		}
 
 		assertThrows<NotFoundException> {
-			arkivRestInterface.receiveMessage(id, createRequestData(id))
+			arkivRestInterface.receiveJournalpost(createRequestData(id))
 		}
 
-		val response = arkivRestInterface.receiveMessage(id, createRequestData(id))
+		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
 
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals(3, behaviourMocking.getNumberOfCalls(id))
 		TimeUnit.SECONDS.sleep(1)
 		verify(kafkaPublisher, times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
 		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), any(), any())
-		verify(kafkaPublisher, times(1)).putNumberOfEntitiesOnTopic(eq(id), eq(dbCountBefore + 1), any())
 	}
 
 	@Test
 	fun `Responds with status 500 three times, third time works - Will save to DB on third attempt`() {
-		val dbCountBefore = arkivRepository.count().toInt()
 		behaviourMocking.mockResponseBehaviour(id, 500, 3)
 
 		assertThrows<InternalServerErrorException> {
-			arkivRestInterface.receiveMessage(id, createRequestData(id))
+			arkivRestInterface.receiveJournalpost(createRequestData(id))
 		}
 
 		assertThrows<InternalServerErrorException> {
-			arkivRestInterface.receiveMessage(id, createRequestData(id))
+			arkivRestInterface.receiveJournalpost(createRequestData(id))
 		}
 
 		assertThrows<InternalServerErrorException> {
-			arkivRestInterface.receiveMessage(id, createRequestData(id))
+			arkivRestInterface.receiveJournalpost(createRequestData(id))
 		}
 
-		val response = arkivRestInterface.receiveMessage(id, createRequestData(id))
+		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals(4, behaviourMocking.getNumberOfCalls(id))
 		TimeUnit.SECONDS.sleep(1)
 		verify(kafkaPublisher, times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
 		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), any(), any())
-		verify(kafkaPublisher, times(1)).putNumberOfEntitiesOnTopic(eq(id), eq(dbCountBefore + 1), any())
 	}
 
 	private fun createRequestData(personId: String) =
