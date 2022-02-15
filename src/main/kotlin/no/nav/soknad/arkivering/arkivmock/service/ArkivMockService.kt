@@ -4,7 +4,6 @@ import no.nav.soknad.arkivering.arkivmock.dto.ArkivData
 import no.nav.soknad.arkivering.arkivmock.dto.ArkivDbData
 import no.nav.soknad.arkivering.arkivmock.dto.Dokumenter
 import no.nav.soknad.arkivering.arkivmock.dto.OpprettJournalpostResponse
-import no.nav.soknad.arkivering.arkivmock.repository.ArkivRepository
 import no.nav.soknad.arkivering.arkivmock.service.kafka.KafkaPublisher
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -13,22 +12,13 @@ import java.time.ZoneOffset
 import java.util.*
 
 @Service
-class ArkivMockService(
-	private val arkivRepository: ArkivRepository,
-	private val behaviourService: BehaviourService,
-	private val kafkaPublisher: KafkaPublisher
-) {
+class ArkivMockService(private val behaviourService: BehaviourService, private val kafkaPublisher: KafkaPublisher) {
 	private val logger = LoggerFactory.getLogger(javaClass)
-
-	fun reset() {
-		arkivRepository.deleteAll()
-	}
 
 	fun archive(key: String, arkivData: ArkivData): String? {
 		reactToArchiveRequest(key)
 
-		val data = createArkivDbData(key, arkivData)
-		saveToDatabaseAndAlertOnKafka(key, data)
+		publishReceivedDataOnKafka(key, arkivData)
 
 		val response = createResponse(arkivData)
 		return behaviourService.alterResponse(key, response)
@@ -63,10 +53,10 @@ class ArkivMockService(
 		)
 	}
 
-	private fun saveToDatabaseAndAlertOnKafka(key: String, data: ArkivDbData) {
-		val dbEntity = arkivRepository.save(data)
+	private fun publishReceivedDataOnKafka(key: String, arkivData: ArkivData) {
 		try {
-			kafkaPublisher.putDataOnTopic(key, dbEntity)
+			val data = createArkivDbData(key, arkivData)
+			kafkaPublisher.putDataOnTopic(key, data)
 		} catch (e: Exception) {
 			logger.error("$key: Failed to publish data to Kafka topic!", e)
 		}

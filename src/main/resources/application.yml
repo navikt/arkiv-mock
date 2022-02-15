@@ -14,11 +14,6 @@ management:
       prometheus:
         enabled: true
 
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
-
 ---
 spring:
   config:
