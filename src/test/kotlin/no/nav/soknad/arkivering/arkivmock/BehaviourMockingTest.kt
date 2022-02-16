@@ -21,7 +21,6 @@ import org.springframework.http.HttpStatus
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 @SpringBootTest
 class BehaviourMockingTest {
@@ -37,7 +36,7 @@ class BehaviourMockingTest {
 
 	@BeforeEach
 	fun setup() {
-		behaviourMocking.resetMockResponseBehaviour(id)
+		behaviourMocking.setNormalResponseBehaviour(id)
 	}
 
 	@AfterEach
@@ -53,10 +52,8 @@ class BehaviourMockingTest {
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertTrue(response.body!!.contains("{\"dokumenter\":[],\"journalpostId\":\""))
 		assertTrue(response.body!!.contains("\",\"journalpostferdigstilt\":true,\"journalstatus\":\"MIDLERTIDIG\",\"melding\":\"null\"}"))
-		assertEquals(1, behaviourMocking.getNumberOfCalls(id))
-		TimeUnit.SECONDS.sleep(1)
-		verify(kafkaPublisher, times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
-		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), any(), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putDataOnTopic(eq(id), any(), any())
 	}
 
 	@Test
@@ -67,10 +64,8 @@ class BehaviourMockingTest {
 
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals("THIS_IS_A_MOCKED_INVALID_RESPONSE", response.body)
-		assertEquals(1, behaviourMocking.getNumberOfCalls(id))
-		TimeUnit.SECONDS.sleep(1)
-		verify(kafkaPublisher, times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
-		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), any(), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putDataOnTopic(eq(id), any(), any())
 	}
 
 	@Test
@@ -88,10 +83,8 @@ class BehaviourMockingTest {
 		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
 
 		assertEquals(HttpStatus.OK, response.statusCode)
-		assertEquals(3, behaviourMocking.getNumberOfCalls(id))
-		TimeUnit.SECONDS.sleep(1)
-		verify(kafkaPublisher, times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
-		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), any(), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putNumberOfCallsOnTopic(eq(id), eq(3), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putDataOnTopic(eq(id), any(), any())
 	}
 
 	@Test
@@ -112,10 +105,8 @@ class BehaviourMockingTest {
 
 		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
 		assertEquals(HttpStatus.OK, response.statusCode)
-		assertEquals(4, behaviourMocking.getNumberOfCalls(id))
-		TimeUnit.SECONDS.sleep(1)
-		verify(kafkaPublisher, times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
-		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), any(), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putNumberOfCallsOnTopic(eq(id), eq(4), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putDataOnTopic(eq(id), any(), any())
 	}
 
 	private fun createRequestData(personId: String) =
