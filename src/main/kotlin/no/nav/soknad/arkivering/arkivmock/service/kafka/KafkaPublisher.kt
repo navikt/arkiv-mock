@@ -1,7 +1,7 @@
 package no.nav.soknad.arkivering.arkivmock.service.kafka
 
 import no.nav.soknad.arkivering.arkivmock.config.AppConfiguration
-import no.nav.soknad.arkivering.arkivmock.dto.ArkivDbData
+import no.nav.soknad.arkivering.arkivmock.dto.ArchiveEntity
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -26,7 +26,7 @@ class KafkaPublisher(private val appConfiguration: AppConfiguration) {
 	private val kafkaIntProducer = KafkaProducer<String, Int>(kafkaConfigMap(IntegerSerializer()))
 
 
-	fun putDataOnTopic(key: String, value: ArkivDbData, headers: Headers = RecordHeaders()) {
+	fun putDataOnTopic(key: String, value: ArchiveEntity, headers: Headers = RecordHeaders()) {
 		val topic = appConfiguration.kafkaConfig.entitiesTopic
 		val kafkaProducer = kafkaStringProducer
 		putDataOnTopic(key, value.toString(), headers, topic, kafkaProducer)

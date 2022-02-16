@@ -1,7 +1,7 @@
 package no.nav.soknad.arkivering.arkivmock.service
 
 import no.nav.soknad.arkivering.arkivmock.dto.ArkivData
-import no.nav.soknad.arkivering.arkivmock.dto.ArkivDbData
+import no.nav.soknad.arkivering.arkivmock.dto.ArchiveEntity
 import no.nav.soknad.arkivering.arkivmock.dto.Dokumenter
 import no.nav.soknad.arkivering.arkivmock.dto.OpprettJournalpostResponse
 import no.nav.soknad.arkivering.arkivmock.service.kafka.KafkaPublisher
@@ -44,8 +44,8 @@ class ArkivMockService(private val behaviourService: BehaviourService, private v
 		return OpprettJournalpostResponse(dokumenter, id, true, "MIDLERTIDIG", "null")
 	}
 
-	private fun createArkivDbData(key: String, arkivData: ArkivData): ArkivDbData {
-		return ArkivDbData(
+	private fun createArchiveEntity(key: String, arkivData: ArkivData): ArchiveEntity {
+		return ArchiveEntity(
 			key,
 			arkivData.tittel,
 			arkivData.tema,
@@ -55,7 +55,7 @@ class ArkivMockService(private val behaviourService: BehaviourService, private v
 
 	private fun publishReceivedDataOnKafka(key: String, arkivData: ArkivData) {
 		try {
-			val data = createArkivDbData(key, arkivData)
+			val data = createArchiveEntity(key, arkivData)
 			kafkaPublisher.putDataOnTopic(key, data)
 		} catch (e: Exception) {
 			logger.error("$key: Failed to publish data to Kafka topic!", e)

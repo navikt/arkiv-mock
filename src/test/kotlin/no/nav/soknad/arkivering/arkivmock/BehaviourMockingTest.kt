@@ -21,7 +21,6 @@ import org.springframework.http.HttpStatus
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 @SpringBootTest
 class BehaviourMockingTest {
@@ -47,20 +46,19 @@ class BehaviourMockingTest {
 	}
 
 	@Test
-	fun `No specified mock behaviour - Will save to DB`() {
+	fun `No specified mock behaviour - Will broadcast on Kafka`() {
 		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
 
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertTrue(response.body!!.contains("{\"dokumenter\":[],\"journalpostId\":\""))
 		assertTrue(response.body!!.contains("\",\"journalpostferdigstilt\":true,\"journalstatus\":\"MIDLERTIDIG\",\"melding\":\"null\"}"))
 		assertEquals(1, behaviourMocking.getNumberOfCalls(id))
-		TimeUnit.SECONDS.sleep(1)
-		verify(kafkaPublisher, times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
-		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), any(), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putDataOnTopic(eq(id), any(), any())
 	}
 
 	@Test
-	fun `Mock response with Ok Status but wrong body - Will save to DB`() {
+	fun `Mock response with Ok Status but wrong body - Will broadcast on Kafka`() {
 		behaviourMocking.mockOkResponseWithErroneousBody(id, 1)
 
 		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
@@ -68,13 +66,12 @@ class BehaviourMockingTest {
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals("THIS_IS_A_MOCKED_INVALID_RESPONSE", response.body)
 		assertEquals(1, behaviourMocking.getNumberOfCalls(id))
-		TimeUnit.SECONDS.sleep(1)
-		verify(kafkaPublisher, times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
-		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), any(), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putDataOnTopic(eq(id), any(), any())
 	}
 
 	@Test
-	fun `Responds with status 404 two times, third time works - Will save to DB on third attempt`() {
+	fun `Responds with status 404 two times, third time works - Will broadcast on Kafka on third attempt`() {
 		behaviourMocking.mockResponseBehaviour(id, 404, 2)
 
 		assertThrows<NotFoundException> {
@@ -89,13 +86,12 @@ class BehaviourMockingTest {
 
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals(3, behaviourMocking.getNumberOfCalls(id))
-		TimeUnit.SECONDS.sleep(1)
-		verify(kafkaPublisher, times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
-		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), any(), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putDataOnTopic(eq(id), any(), any())
 	}
 
 	@Test
-	fun `Responds with status 500 three times, third time works - Will save to DB on third attempt`() {
+	fun `Responds with status 500 three times, third time works - Will broadcast on Kafka on third attempt`() {
 		behaviourMocking.mockResponseBehaviour(id, 500, 3)
 
 		assertThrows<InternalServerErrorException> {
@@ -113,9 +109,8 @@ class BehaviourMockingTest {
 		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals(4, behaviourMocking.getNumberOfCalls(id))
-		TimeUnit.SECONDS.sleep(1)
-		verify(kafkaPublisher, times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
-		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), any(), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
+		verify(kafkaPublisher, timeout(1000).times(1)).putDataOnTopic(eq(id), any(), any())
 	}
 
 	private fun createRequestData(personId: String) =

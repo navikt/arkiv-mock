@@ -2,7 +2,7 @@ package no.nav.soknad.arkivering.arkivmock
 
 import com.nhaarman.mockitokotlin2.*
 import no.nav.soknad.arkivering.arkivmock.dto.ArkivData
-import no.nav.soknad.arkivering.arkivmock.dto.ArkivDbData
+import no.nav.soknad.arkivering.arkivmock.dto.ArchiveEntity
 import no.nav.soknad.arkivering.arkivmock.dto.Bruker
 import no.nav.soknad.arkivering.arkivmock.rest.ArkivRestInterface
 import no.nav.soknad.arkivering.arkivmock.rest.BehaviourMocking
@@ -38,7 +38,7 @@ class IntegrationTest {
 
 		arkivRestInterface.receiveJournalpost(createRequestData(id))
 
-		val captor = argumentCaptor<ArkivDbData>()
+		val captor = argumentCaptor<ArchiveEntity>()
 		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), captor.capture(), any())
 		val result = captor.firstValue
 		assertEquals(id, result.id)
