@@ -4,7 +4,10 @@ import no.nav.soknad.arkivering.arkivmock.service.BehaviourService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/arkiv-mock/response-behaviour")
@@ -21,7 +24,7 @@ class BehaviourMocking(val behaviourService: BehaviourService) {
 
 		behaviourService.mockException(key, statusCode, forAttempts)
 
-		return ResponseEntity("", HttpStatus.OK)
+		return ResponseEntity(HttpStatus.OK)
 	}
 
 	@PutMapping("/set-status-ok-with-erroneous-body/{key}/{forAttempts}")
@@ -33,7 +36,7 @@ class BehaviourMocking(val behaviourService: BehaviourService) {
 
 		behaviourService.mockResponseWithErroneousBody(key, forAttempts)
 
-		return ResponseEntity("", HttpStatus.OK)
+		return ResponseEntity(HttpStatus.OK)
 	}
 
 	@PutMapping("/set-normal-behaviour/{key}")
@@ -42,18 +45,6 @@ class BehaviourMocking(val behaviourService: BehaviourService) {
 
 		behaviourService.setNormalBehaviour(key)
 
-		return ResponseEntity("", HttpStatus.OK)
-	}
-
-	@PutMapping("/reset/{key}")
-	fun resetMockResponseBehaviour(@PathVariable("key") key: String) = setNormalResponseBehaviour(key)
-
-	@GetMapping("/number-of-calls/{key}")
-	fun getNumberOfCalls(@PathVariable("key") key: String): Int {
-		val numberOfCallsThatHaveBeenMade = behaviourService.getNumberOfCallsThatHaveBeenMade(key)
-
-		logger.info("$key: There have been made $numberOfCallsThatHaveBeenMade calls to save to the archive for this key")
-
-		return numberOfCallsThatHaveBeenMade
+		return ResponseEntity(HttpStatus.OK)
 	}
 }
