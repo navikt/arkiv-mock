@@ -39,14 +39,6 @@ spec:
       value: SASL_SSL
     - name: KAFKA_SASLMEC
       value: PLAIN
-    - name: DATABASE_PORT
-      value: "5432"
-    - name: DATABASE_HOST
-      value: b27dbvl026.preprod.local
-    - name: DATABASE_NAME
-      value: arkiv-mock-db-teamsoknad
-    - name: VAULT_DB_PATH
-      value: postgresql/preprod-fss
     - name: APPLICATION_PROFILE
       value: dev
     - name: ISSO_WELL_KNOWN_URL

@@ -2,14 +2,11 @@ package no.nav.soknad.arkivering.arkivmock.dto
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
 
-@Entity
-@Table(name = "archive")
-class ArkivDbData(
-	@Id
+/**
+ * Subset of [ArkivData], used for broadcasting on Kafka that the app received data.
+ */
+class ArchiveEntity(
 	val id: String,
 	val title: String,
 	val tema: String,

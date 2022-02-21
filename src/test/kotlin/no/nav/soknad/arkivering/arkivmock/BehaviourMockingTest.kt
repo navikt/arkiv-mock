@@ -46,7 +46,7 @@ class BehaviourMockingTest {
 	}
 
 	@Test
-	fun `No specified mock behaviour - Will save to DB`() {
+	fun `No specified mock behaviour - Will broadcast on Kafka`() {
 		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
 
 		assertEquals(HttpStatus.OK, response.statusCode)
@@ -57,7 +57,7 @@ class BehaviourMockingTest {
 	}
 
 	@Test
-	fun `Mock response with Ok Status but wrong body - Will save to DB`() {
+	fun `Mock response with Ok Status but wrong body - Will broadcast on Kafka`() {
 		behaviourMocking.mockOkResponseWithErroneousBody(id, 1)
 
 		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
@@ -69,7 +69,7 @@ class BehaviourMockingTest {
 	}
 
 	@Test
-	fun `Responds with status 404 two times, third time works - Will save to DB on third attempt`() {
+	fun `Responds with status 404 two times, third time works - Will broadcast on Kafka on third attempt`() {
 		behaviourMocking.mockResponseBehaviour(id, 404, 2)
 
 		assertThrows<NotFoundException> {
@@ -88,7 +88,7 @@ class BehaviourMockingTest {
 	}
 
 	@Test
-	fun `Responds with status 500 three times, third time works - Will save to DB on third attempt`() {
+	fun `Responds with status 500 three times, third time works - Will broadcast on Kafka on third attempt`() {
 		behaviourMocking.mockResponseBehaviour(id, 500, 3)
 
 		assertThrows<InternalServerErrorException> {
