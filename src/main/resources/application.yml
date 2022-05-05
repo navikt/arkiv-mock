@@ -27,6 +27,17 @@ no.nav.security.jwt:
       accepted_audience: aud-localhost
       cookie_name: localhost-idtoken
 
+kafkaconfig:
+  secure: FALSE
+  kafkaBrokers: localhost:29092
+  truststorePath: path
+  keystorePath: path
+  credstorePassword: pass
+
+  entitiesTopic: privat-soknadInnsendt-systemTests-entities
+  numberOfCallsTopic: privat-soknadInnsendt-systemTests-numberOfCalls
+
+
 ---
 spring:
   config:
@@ -40,3 +51,13 @@ no.nav.security.jwt:
     discoveryurl: ${ISSO_WELL_KNOWN_URL}
     accepted_audience: ${ACCEPTEDAUDIENCE}, api://${ACCEPTEDAUDIENCE}
     cookie_name: isso_token
+
+kafkaconfig:
+  secure: ${KAFKA_SECURITY}
+  kafkaBrokers: ${KAFKA_BROKERS}
+  truststorePath: ${KAFKA_TRUSTSTORE_PATH}
+  keystorePath: ${KAFKA_KEYSTORE_PATH}
+  credstorePassword: ${KAFKA_CREDSTORE_PASSWORD}
+
+  entitiesTopic: ${KAFKA_ENTITIES_TOPIC}
+  numberOfCallsTopic: ${KAFKA_NUMBEROFCALLS_TOPIC}
