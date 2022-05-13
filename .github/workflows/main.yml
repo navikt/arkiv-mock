@@ -47,5 +47,5 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: .nais/nais-dev.yml,.nais/topics/config-systemTests-entities-dev.yml,.nais/topics/config-systemtests-numberOfCalls-dev.yml
+          RESOURCE: .nais/nais-dev.yml,.nais/topics/config-systemTests-entities-dev.yml,.nais/topics/config-systemTests-numberOfCalls-dev.yml
           VAR: image=${{ env.docker_image }}
