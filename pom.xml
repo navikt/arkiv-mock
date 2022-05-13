@@ -19,7 +19,8 @@
 		<token-support.version>2.0.15</token-support.version>
 
 		<logstash.version>7.1.1</logstash.version>
-		<konfig.version>1.6.10.0</konfig.version>
+		<kafka.version>3.2.0</kafka.version>
+		<jakarta-validation.version>3.0.1</jakarta-validation.version>
 		<coroutines.version>1.6.1</coroutines.version>
 		<mockito-kotlin.version>2.2.0</mockito-kotlin.version>
 
@@ -75,21 +76,15 @@
 			<artifactId>json-smart</artifactId>
 			<version>${json-smart.version}</version>
 		</dependency>
-
 		<dependency>
-			<groupId>com.natpryce</groupId>
-			<artifactId>konfig</artifactId>
-			<version>${konfig.version}</version>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>${jakarta-validation.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
-			<version>${kafka.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka-streams</artifactId>
 			<version>${kafka.version}</version>
 		</dependency>
 
@@ -116,12 +111,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>jakarta.validation</groupId>
-			<artifactId>jakarta.validation-api</artifactId>
-			<version>3.0.1</version>
-		</dependency>
-
 	</dependencies>
 
 	<build>
