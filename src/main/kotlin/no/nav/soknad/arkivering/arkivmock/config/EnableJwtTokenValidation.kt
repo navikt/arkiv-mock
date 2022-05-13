@@ -11,6 +11,6 @@ import org.springframework.context.annotation.Profile
 	"org.springdoc",
 	"org.webjars.swagger-ui"
 ])
-@Profile("dev")
+@Profile("dev-disabled-until-we-find-joark")
 @Configuration
 class JwtTokenValidationConfig
