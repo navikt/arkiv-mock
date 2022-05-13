@@ -18,30 +18,6 @@ management:
 spring:
   config:
     activate:
-      on-profile: test | spring | default
-
-no.nav.security.jwt:
-  issuer:
-    isso:
-      discoveryurl: https://localhost/metadata
-      accepted_audience: aud-localhost
-      cookie_name: localhost-idtoken
-
-kafkaconfig:
-  secure: FALSE
-  kafkaBrokers: localhost:29092
-  truststorePath: path
-  keystorePath: path
-  credstorePassword: pass
-
-  entitiesTopic: privat-soknadInnsendt-systemTests-entities
-  numberOfCallsTopic: privat-soknadInnsendt-systemTests-numberOfCalls
-
-
----
-spring:
-  config:
-    activate:
       on-profile: dev | docker
 
 no.nav.security.jwt:
@@ -59,5 +35,29 @@ kafkaconfig:
   keystorePath: ${KAFKA_KEYSTORE_PATH}
   credstorePassword: ${KAFKA_CREDSTORE_PASSWORD}
 
-  entitiesTopic: ${KAFKA_ENTITIES_TOPIC:privat-soknadInnsendt-systemTests-entities}
-  numberOfCallsTopic: ${KAFKA_NUMBEROFCALLS_TOPIC:privat-soknadInnsendt-systemTests-numberOfCalls}
+  entitiesTopic: ${KAFKA_ENTITIES_TOPIC:privat-soknadinnsending-systemtests-entities}
+  numberOfCallsTopic: ${KAFKA_NUMBEROFCALLS_TOPIC:privat-soknadinnsending-systemtests-numberofcalls}
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test | default
+
+no.nav.security.jwt:
+  issuer:
+    isso:
+      discoveryurl: https://localhost/metadata
+      accepted_audience: aud-localhost
+      cookie_name: localhost-idtoken
+
+kafkaconfig:
+  secure: FALSE
+  kafkaBrokers: localhost:29092
+  truststorePath: path
+  keystorePath: path
+  credstorePassword: pass
+
+  entitiesTopic: privat-soknadinnsending-systemtests-entities
+  numberOfCallsTopic: privat-soknadinnsending-systemtests-numberofcalls
