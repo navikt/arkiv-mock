@@ -27,7 +27,7 @@ spec:
   kafka:
     pool: nav-dev
   env:
-    - name: APPLICATION_PROFILE
+    - name: SPRING_PROFILES_ACTIVE
       value: dev
     - name: ISSO_WELL_KNOWN_URL
       value: https://security-token-service.nais.preprod.local/rest/v1/sts/.well-known/openid-configuration
