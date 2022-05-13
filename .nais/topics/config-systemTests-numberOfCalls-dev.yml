@@ -1,7 +1,7 @@
 apiVersion: kafka.nais.io/v1
 kind: Topic
 metadata:
-  name: privat-soknadInnsendt-systemTests-numberOfCalls
+  name: privat-soknadinnsending-systemtests-numberofcalls
   namespace: team-soknad
   labels:
     team: team-soknad
