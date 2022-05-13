@@ -18,7 +18,7 @@ management:
 spring:
   config:
     activate:
-      on-profile: test | spring | default | docker
+      on-profile: test | spring | default
 
 no.nav.security.jwt:
   issuer:
@@ -42,7 +42,7 @@ kafkaconfig:
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: dev | docker
 
 no.nav.security.jwt:
   expirythreshold: ${EXPIRYTHRESHOLD} #threshold in minutes until token expires
@@ -59,5 +59,5 @@ kafkaconfig:
   keystorePath: ${KAFKA_KEYSTORE_PATH}
   credstorePassword: ${KAFKA_CREDSTORE_PASSWORD}
 
-  entitiesTopic: ${KAFKA_ENTITIES_TOPIC}
-  numberOfCallsTopic: ${KAFKA_NUMBEROFCALLS_TOPIC}
+  entitiesTopic: ${KAFKA_ENTITIES_TOPIC:privat-soknadInnsendt-systemTests-entities}
+  numberOfCallsTopic: ${KAFKA_NUMBEROFCALLS_TOPIC:privat-soknadInnsendt-systemTests-numberOfCalls}
