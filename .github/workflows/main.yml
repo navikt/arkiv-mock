@@ -37,7 +37,6 @@ jobs:
           context: .
           push: true
           tags: ${{ env.docker_image }}
-
   deploy-loadtests:
     name: Deploy to loadtests
     needs: build
@@ -48,5 +47,5 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: .nais/arkiv-mock.yml
+          RESOURCE: .nais/nais-dev.yml,.nais/topics/config-systemTests-entities-dev.yml,.nais/topics/config-systemTests-numberOfCalls-dev.yml
           VAR: image=${{ env.docker_image }}

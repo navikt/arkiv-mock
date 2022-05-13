@@ -26,7 +26,6 @@ spec:
         - application: soknadsarkiverer
   kafka:
     pool: nav-dev
-
   env:
     - name: APPLICATION_PROFILE
       value: dev
