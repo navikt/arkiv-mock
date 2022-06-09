@@ -19,7 +19,6 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 			.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 			.antMatchers(HttpMethod.POST, "/login", "/register").permitAll()
 			.antMatchers(HttpMethod.GET, "/internal").permitAll()
-			.antMatchers(HttpMethod.DELETE, "/rest/journalpostapi/v1/reset").permitAll()
 			.antMatchers("/rest/journalpostapi/v1/journalpost").permitAll()
 			.and()
 			.httpBasic()
