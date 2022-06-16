@@ -21,12 +21,10 @@ spring:
       on-profile: dev | docker
 
 no.nav.security.jwt:
-  expirythreshold: ${EXPIRYTHRESHOLD} #threshold in minutes until token expires
-
-  issuer.isso:
-    discoveryurl: ${ISSO_WELL_KNOWN_URL}
-    accepted_audience: ${ACCEPTEDAUDIENCE}, api://${ACCEPTEDAUDIENCE}
-    cookie_name: isso_token
+  issuer.azuread:
+    discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
+    accepted_audience: ${AZURE_APP_CLIENT_ID}
+    cookie_name: azure_token
 
 kafkaconfig:
   secure: ${KAFKA_SECURITY}
