@@ -23,7 +23,7 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: soknadsarkiverer
+        - application: soknadsarkiverer-loadtests
   kafka:
     pool: nav-dev
   azure:
