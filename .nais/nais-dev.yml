@@ -35,6 +35,6 @@ spec:
     - name: KAFKA_SECURITY
       value: 'TRUE'
     - name: KAFKA_ENTITIES_TOPIC
-      value: privat-soknadinnsending-systemtests-entities
+      value: team-soknad.privat-soknadinnsending-systemtests-entities
     - name: KAFKA_NUMBEROFCALLS_TOPIC
-      value: privat-soknadinnsending-systemtests-numberofcalls
+      value: team-soknad.privat-soknadinnsending-systemtests-numberofcalls

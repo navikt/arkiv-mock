@@ -33,8 +33,8 @@ kafkaconfig:
   keystorePath: ${KAFKA_KEYSTORE_PATH}
   credstorePassword: ${KAFKA_CREDSTORE_PASSWORD}
 
-  entitiesTopic: ${KAFKA_ENTITIES_TOPIC:privat-soknadinnsending-systemtests-entities}
-  numberOfCallsTopic: ${KAFKA_NUMBEROFCALLS_TOPIC:privat-soknadinnsending-systemtests-numberofcalls}
+  entitiesTopic: ${KAFKA_ENTITIES_TOPIC:team-soknad.privat-soknadinnsending-systemtests-entities}
+  numberOfCallsTopic: ${KAFKA_NUMBEROFCALLS_TOPIC:team-soknad.privat-soknadinnsending-systemtests-numberofcalls}
 
 
 ---
@@ -57,5 +57,5 @@ kafkaconfig:
   keystorePath: path
   credstorePassword: pass
 
-  entitiesTopic: privat-soknadinnsending-systemtests-entities
-  numberOfCallsTopic: privat-soknadinnsending-systemtests-numberofcalls
+  entitiesTopic: team-soknad.privat-soknadinnsending-systemtests-entities
+  numberOfCallsTopic: team-soknad.privat-soknadinnsending-systemtests-numberofcalls
