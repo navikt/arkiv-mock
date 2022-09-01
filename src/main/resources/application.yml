@@ -49,6 +49,10 @@ no.nav.security.jwt:
       discoveryurl: https://localhost/metadata
       accepted_audience: aud-localhost
       cookie_name: localhost-idtoken
+    azure:
+      discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
+      #https://soknad-oauth2-mock.dev.nav.no/default/.well-known/openid-configuration
+      accepted_audience: ${AZURE_APP_CLIENT_ID}
 
 kafkaconfig:
   secure: FALSE
