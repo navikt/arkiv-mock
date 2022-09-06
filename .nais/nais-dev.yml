@@ -1,12 +1,13 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: "320M"
   name: arkiv-mock
   namespace: team-soknad
   labels:
     team: team-soknad
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "400M"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
 spec:
   image: {{image}}
   port: 8092
