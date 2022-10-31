@@ -1,6 +1,8 @@
 package no.nav.soknad.arkivering.arkivmock
 
-import com.nhaarman.mockitokotlin2.*
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.slot
+import io.mockk.verify
 import no.nav.soknad.arkivering.arkivmock.dto.ArkivData
 import no.nav.soknad.arkivering.arkivmock.dto.ArchiveEntity
 import no.nav.soknad.arkivering.arkivmock.dto.Bruker
@@ -12,7 +14,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -27,7 +28,7 @@ class IntegrationTest {
 	private lateinit var arkivRestInterface: ArkivRestInterface
 	@Autowired
 	private lateinit var behaviourMocking: BehaviourMocking
-	@MockBean
+	@MockkBean(relaxed = true)
 	private lateinit var kafkaPublisher: KafkaPublisher
 
 	@Test
@@ -38,9 +39,9 @@ class IntegrationTest {
 
 		arkivRestInterface.receiveJournalpost(createRequestData(id))
 
-		val captor = argumentCaptor<ArchiveEntity>()
-		verify(kafkaPublisher, times(1)).putDataOnTopic(eq(id), captor.capture(), any())
-		val result = captor.firstValue
+		val captor = slot<ArchiveEntity>()
+		verify(exactly = 1) { kafkaPublisher.putDataOnTopic(eq(id), capture(captor), any()) }
+		val result = captor.captured
 		assertEquals(id, result.id)
 		assertEquals(tema, result.tema)
 		assertEquals(title, result.title)

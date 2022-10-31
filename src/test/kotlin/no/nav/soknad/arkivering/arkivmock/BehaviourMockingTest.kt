@@ -1,6 +1,7 @@
 package no.nav.soknad.arkivering.arkivmock
 
-import com.nhaarman.mockitokotlin2.*
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.verify
 import no.nav.soknad.arkivering.arkivmock.dto.ArkivData
 import no.nav.soknad.arkivering.arkivmock.dto.Bruker
 import no.nav.soknad.arkivering.arkivmock.exceptions.InternalServerErrorException
@@ -8,7 +9,6 @@ import no.nav.soknad.arkivering.arkivmock.exceptions.NotFoundException
 import no.nav.soknad.arkivering.arkivmock.rest.ArkivRestInterface
 import no.nav.soknad.arkivering.arkivmock.rest.BehaviourMocking
 import no.nav.soknad.arkivering.arkivmock.service.kafka.KafkaPublisher
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpStatus
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -29,7 +28,7 @@ class BehaviourMockingTest {
 	private lateinit var arkivRestInterface: ArkivRestInterface
 	@Autowired
 	private lateinit var behaviourMocking: BehaviourMocking
-	@MockBean
+	@MockkBean(relaxed = true)
 	private lateinit var kafkaPublisher: KafkaPublisher
 
 	private val id = UUID.randomUUID().toString()
@@ -39,12 +38,6 @@ class BehaviourMockingTest {
 		behaviourMocking.setNormalResponseBehaviour(id)
 	}
 
-	@AfterEach
-	fun teardown() {
-		reset(kafkaPublisher)
-		clearInvocations(kafkaPublisher)
-	}
-
 	@Test
 	fun `No specified mock behaviour - Will broadcast on Kafka`() {
 		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
@@ -52,8 +45,8 @@ class BehaviourMockingTest {
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertTrue(response.body!!.contains("{\"dokumenter\":[],\"journalpostId\":\""))
 		assertTrue(response.body!!.contains("\",\"journalpostferdigstilt\":true,\"journalstatus\":\"MIDLERTIDIG\",\"melding\":\"null\"}"))
-		verify(kafkaPublisher, timeout(1000).times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
-		verify(kafkaPublisher, timeout(1000).times(1)).putDataOnTopic(eq(id), any(), any())
+		verify(timeout = 1000, exactly = 1) { kafkaPublisher.putNumberOfCallsOnTopic(eq(id), eq(1), any()) }
+		verify(timeout = 1000, exactly = 1) { kafkaPublisher.putDataOnTopic(eq(id), any(), any()) }
 	}
 
 	@Test
@@ -64,8 +57,8 @@ class BehaviourMockingTest {
 
 		assertEquals(HttpStatus.OK, response.statusCode)
 		assertEquals("THIS_IS_A_MOCKED_INVALID_RESPONSE", response.body)
-		verify(kafkaPublisher, timeout(1000).times(1)).putNumberOfCallsOnTopic(eq(id), eq(1), any())
-		verify(kafkaPublisher, timeout(1000).times(1)).putDataOnTopic(eq(id), any(), any())
+		verify(timeout = 1000, exactly = 1) { kafkaPublisher.putNumberOfCallsOnTopic(eq(id), eq(1), any()) }
+		verify(timeout = 1000, exactly = 1) { kafkaPublisher.putDataOnTopic(eq(id), any(), any()) }
 	}
 
 	@Test
@@ -83,8 +76,8 @@ class BehaviourMockingTest {
 		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
 
 		assertEquals(HttpStatus.OK, response.statusCode)
-		verify(kafkaPublisher, timeout(1000).times(1)).putNumberOfCallsOnTopic(eq(id), eq(3), any())
-		verify(kafkaPublisher, timeout(1000).times(1)).putDataOnTopic(eq(id), any(), any())
+		verify(timeout = 1000, exactly = 1) { kafkaPublisher.putNumberOfCallsOnTopic(eq(id), eq(3), any()) }
+		verify(timeout = 1000, exactly = 1) { kafkaPublisher.putDataOnTopic(eq(id), any(), any()) }
 	}
 
 	@Test
@@ -105,8 +98,8 @@ class BehaviourMockingTest {
 
 		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
 		assertEquals(HttpStatus.OK, response.statusCode)
-		verify(kafkaPublisher, timeout(1000).times(1)).putNumberOfCallsOnTopic(eq(id), eq(4), any())
-		verify(kafkaPublisher, timeout(1000).times(1)).putDataOnTopic(eq(id), any(), any())
+		verify(timeout = 1000, exactly = 1) { kafkaPublisher.putNumberOfCallsOnTopic(eq(id), eq(4), any()) }
+		verify(timeout = 1000, exactly = 1) { kafkaPublisher.putDataOnTopic(eq(id), any(), any()) }
 	}
 
 	private fun createRequestData(personId: String) =
