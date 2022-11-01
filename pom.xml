@@ -16,7 +16,7 @@
 	<description>Mock replacement of the Joark Archive, used for end-to-end and load tests.</description>
 
 	<properties>
-		<token-support.version>2.0.15</token-support.version>
+		<token-support.version>2.1.7</token-support.version>
 
 		<logstash.version>7.2</logstash.version>
 		<kafka.version>3.3.1</kafka.version>
@@ -26,7 +26,7 @@
 		<mockk.version>1.13.2</mockk.version>
 
 		<java.version>17</java.version>
-		<kotlin.version>1.7.0</kotlin.version>
+		<kotlin.version>1.7.20</kotlin.version>
 	</properties>
 
 	<dependencies>
