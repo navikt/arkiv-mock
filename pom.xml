@@ -24,6 +24,7 @@
 		<coroutines.version>1.6.4</coroutines.version>
 		<springmockk.version>4.0.0</springmockk.version>
 		<mockk.version>1.13.3</mockk.version>
+		<graphql-kotlin.version>6.5.3</graphql-kotlin.version>
 
 		<java.version>17</java.version>
 		<kotlin.version>1.7.22</kotlin.version>
@@ -94,6 +95,12 @@
 			<artifactId>kotlinx-coroutines-core</artifactId>
 			<version>${coroutines.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.expediagroup</groupId>
+			<artifactId>graphql-kotlin-spring-client</artifactId>
+			<version>${graphql-kotlin.version}</version>
+			<scope>compile</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -134,6 +141,25 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>com.expediagroup</groupId>
+				<artifactId>graphql-kotlin-maven-plugin</artifactId>
+				<version>${graphql-kotlin.version}</version>
+				<executions>
+					<execution>
+						<id>generate-saf-client</id>
+						<goals>
+							<goal>generate-client</goal>
+						</goals>
+						<configuration>
+							<queryFileDirectory>${project.basedir}/src/main/resources/graphql/saf</queryFileDirectory>
+							<schemaFile>${project.basedir}/src/main/resources/graphql/saf/saf.graphqls</schemaFile>
+							<packageName>no.nav.soknad.arkivering.saf.generated</packageName>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>
