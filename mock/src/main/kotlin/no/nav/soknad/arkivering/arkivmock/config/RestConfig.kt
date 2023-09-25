@@ -7,10 +7,10 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
-class WebSecurityConfig {
+open class WebSecurityConfig {
 
 	@Bean
-	fun filterChain(http: HttpSecurity): SecurityFilterChain {
+	open fun filterChain(http: HttpSecurity): SecurityFilterChain {
 		http
 			.csrf().disable()
 			.sessionManagement()

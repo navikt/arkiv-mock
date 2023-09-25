@@ -6,7 +6,7 @@ import org.springframework.boot.runApplication
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-class ArkivMockApplication
+open class ArkivMockApplication
 
 fun main(args: Array<String>) {
 	runApplication<ArkivMockApplication>(*args)
