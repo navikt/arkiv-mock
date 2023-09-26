@@ -93,6 +93,16 @@
 			<version>${coroutines.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.jetbrains.kotlinx</groupId>
+			<artifactId>kotlinx-coroutines-slf4j</artifactId>
+			<version>${coroutines.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlinx</groupId>
+			<artifactId>kotlinx-serialization-json</artifactId>
+			<version>${kotlin-serialization.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.expediagroup</groupId>
 			<artifactId>graphql-kotlin-spring-client</artifactId>
 			<version>${graphql-kotlin.version}</version>
@@ -114,6 +124,16 @@
 					<artifactId>junit-vintage-engine</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-maven-allopen</artifactId>
+			<version>${kotlin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-maven-noarg</artifactId>
+			<version>${kotlin.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ninja-squad</groupId>
@@ -179,15 +199,16 @@
 					</execution>
 				</executions>
 				<configuration>
+					<nowarn>true</nowarn>
+					<args>
+						<arg>-Xjsr305=strict</arg>
+					</args>
+					<compilerPlugins>
+						<plugin>spring</plugin>
+						<plugin>jpa</plugin>
+						<plugin>kotlinx-serialization</plugin>
+					</compilerPlugins>
 					<jvmTarget>${java.version}</jvmTarget>
-					<!--
-										<args>
-											<arg>-Xjsr305=strict</arg>
-										</args>
-										<compilerPlugins>
-											<plugin>spring</plugin>
-										</compilerPlugins>
-					-->
 				</configuration>
 				<dependencies>
 					<dependency>
@@ -198,6 +219,11 @@
 					<dependency>
 						<groupId>org.jetbrains.kotlin</groupId>
 						<artifactId>kotlin-maven-noarg</artifactId>
+						<version>${kotlin.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.jetbrains.kotlin</groupId>
+						<artifactId>kotlin-maven-serialization</artifactId>
 						<version>${kotlin.version}</version>
 					</dependency>
 				</dependencies>

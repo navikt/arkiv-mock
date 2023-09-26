@@ -44,21 +44,9 @@
 
 		<java.version>17</java.version>
 		<kotlin.version>1.7.22</kotlin.version>
+		<kotlin-serialization.version>1.5.1</kotlin-serialization.version>
 	</properties>
 
-<!--
-	<build>
-
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-
-		</plugins>
-	</build>
-
--->
 	<repositories>
 		<repository>
 			<id>confluent</id>
