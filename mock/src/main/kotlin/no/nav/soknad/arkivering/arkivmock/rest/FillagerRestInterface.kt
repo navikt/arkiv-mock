@@ -12,9 +12,8 @@ import org.springframework.http.ResponseEntity
 
 @RestController
 @Protected
-class FillagerRestInterface(): InnsendteApi
+class InnsendingApiRestInterface(): InnsendteApi
 {
-
 	private val logger = LoggerFactory.getLogger(javaClass)
 
 	override fun aktiveSaker(): ResponseEntity<List<AktivSakDto>> {
