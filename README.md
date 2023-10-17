@@ -1,5 +1,5 @@
 # arkiv-mock
-This component acts as a mock for Joark. It is intended to be used for end-to-end and load tests, but not in production.
+This component acts as a mock for Joark, SAF and innsending-api. It is intended to be used for end-to-end and load tests, but not in production.
 
 The components' behaviour can be controlled, so that it can for instance respond with errors a certain amount of times.
 When the component receives data, it will broadcast information about the data to Kafka topics, where interested consumers (i.e. the [system-tests](https://github.com/navikt/archiving-infrastructure)) can listen.
