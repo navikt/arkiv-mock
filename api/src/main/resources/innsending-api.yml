@@ -769,10 +769,6 @@ paths:
       responses:
         '200':
           description: Successful operation; application is responding
-          content:
-            text/plain:
-              schema:
-                type: string
 
       tags:
         - health
@@ -787,10 +783,6 @@ paths:
       responses:
         '200':
           description: Successful operation; application is alive
-          content:
-            text/plain:
-              schema:
-                type: string
         '500':
           description: The application or one of its dependencies are not up and running.
       tags:
@@ -806,10 +798,6 @@ paths:
       responses:
         '200':
           description: Successful operation; application is ready
-          content:
-            text/plain:
-              schema:
-                type: string
 
         '503':
           description: The application or one of its dependencies are not ready
@@ -868,27 +856,28 @@ components:
 
     ApplicationStatus:
       type: object
-      description: Applikasjonsnavn og liste med konnektivitets status mot applikasjonens backend avhengigheter.
+      description: Operativ status på applikasjonen
       required:
-        - applicationName
-        - checked
-        - dependencyStatusList
+        - status
 
       properties:
-        applicationName:
+        status:
+          $ref: "#/components/schemas/ApplicationStatusType"
+        description:
           type: string
-          description: Navn på applikasjonen
-          example: Innsending-api
-        checkedDate:
+          description: Beskrivelse av feilsituasjon
+          example: "Databasen i innsending-api er nede"
+        logLink:
           type: string
-          format: date-time
-          description: Dato og tid som UTC status sjekket
-          example: 2023-03-30T14:10:00Z
-        dependencyStatusList:
-          type: array
-          description: Liste med status av hver av avhengighetene til denne applikasjonen
-          items:
-            $ref: "#/components/schemas/DependencyStatus"
+          description: Link til Kibana logs for mer info om feilen
+          example: https://logs.adeo.no/app/discover#/view/170a6860-df4c-11ed-8b42-0b0644af4500
+
+    ApplicationStatusType:
+      type: string
+      enum: [ "OK", "ISSUE", "DOWN" ]
+      x-enum-varnames: [ "OK", "ISSUE", "DOWN" ]
+      description: Operativ status på applikasjonen. (OK=Tjeneste er tilgjengelig og fungerer normalt, ISSUE=Tjeneste er tilgjengelig, men med begrenset funksjonalitet/kapasitet, DOWN=Tjeneste er utilgjengelig)
+      example: OK
 
     ArkiveringsStatusDto:
       type: string
