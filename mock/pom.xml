@@ -10,6 +10,7 @@
 	</parent>
 
 	<artifactId>mock</artifactId>
+	<packaging>jar</packaging>
 
 	<properties>
 		<maven.compiler.source>21</maven.compiler.source>
@@ -157,6 +158,7 @@
 
 
 	<build>
+		<finalName>app</finalName>
 		<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
 		<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
 
