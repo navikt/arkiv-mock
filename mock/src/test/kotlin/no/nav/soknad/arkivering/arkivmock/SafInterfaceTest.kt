@@ -1,7 +1,5 @@
 package no.nav.soknad.arkivering.arkivmock
 
-import io.mockk.verify
-import no.nav.soknad.arkivering.arkivmock.rest.ArkivRestInterface
 import no.nav.soknad.arkivering.arkivmock.rest.GraphQLRequest
 import no.nav.soknad.arkivering.arkivmock.rest.SafRestInterface
 import no.nav.soknad.arkivering.saf.generated.HENT_JOURNALPOST_GITT_EKSTERN_REFERANSE_ID
