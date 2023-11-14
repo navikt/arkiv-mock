@@ -4,6 +4,8 @@ ENV SPRING_PROFILES_ACTIVE=docker
 ENV KAFKA_BROKERS=kafka-broker:29092
 ENV LANG='nb_NO.UTF-8' LANGUAGE='nb_NO:nb' LC_ALL='nb:NO.UTF-8' TZ="Europe/Oslo"
 
-COPY mock/target/*.jar app.jar
+COPY mock/target/app.jar /app/app.jar
+
+WORKDIR /app
 
 CMD ["app.jar"]
