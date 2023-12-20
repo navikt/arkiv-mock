@@ -47,4 +47,14 @@ class BehaviourMocking(val behaviourService: BehaviourService) {
 
 		return ResponseEntity(HttpStatus.OK)
 	}
+
+	@PutMapping("/mock-file-response/{key}/{fileResponse}")
+	fun setFileResponseBehaviour(@PathVariable("key") key: String, @PathVariable("fileResponse") fileResponse: String): ResponseEntity<String> {
+		logger.debug("$key: will accept all calls and return http status ${HttpStatus.OK}")
+
+		behaviourService.setNormalBehaviour(key)
+
+		return ResponseEntity(HttpStatus.OK)
+	}
+
 }
