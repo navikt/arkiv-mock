@@ -31,7 +31,7 @@ class InnsendingApiRestInterface(val behaviourService: BehaviourService): Innsen
 		logger.info("$xInnsendingId: Kall for å hente filene $uuids til en innsendt søknad")
 
 		val innsendteFiler  = mutableListOf<SoknadFile>()
-		uuids.forEach { behaviourService.getFile(it) }
+		uuids.forEach { innsendteFiler.add(behaviourService.getFile(it)) }
 		logger.info(
 			"$xInnsendingId: Status for henting av følgende innsendte filer ${
 				innsendteFiler.map { it.id + ":" + it.fileStatus + ":size=" + it.content?.size }.toList()

@@ -1,6 +1,7 @@
 package no.nav.soknad.arkivering.arkivmock.rest
 
 import no.nav.soknad.arkivering.arkivmock.service.BehaviourService
+import no.nav.soknad.arkivering.arkivmock.service.FileResponses
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -48,11 +49,20 @@ class BehaviourMocking(val behaviourService: BehaviourService) {
 		return ResponseEntity(HttpStatus.OK)
 	}
 
-	@PutMapping("/mock-file-response/{key}/{fileResponse}")
-	fun setFileResponseBehaviour(@PathVariable("key") key: String, @PathVariable("fileResponse") fileResponse: String): ResponseEntity<String> {
-		logger.debug("$key: will accept all calls and return http status ${HttpStatus.OK}")
+	@PutMapping("/mock-file-response/{key}/{fileResponse}/{forAttempts}")
+	fun setFileResponseBehaviour(
+		@PathVariable("key") key: String,
+		@PathVariable("fileResponse") fileResponse: String = FileResponses.One_MB.name,
+		@PathVariable("forAttempts") forAttempts: Int = -1
+	): ResponseEntity<String> {
 
-		behaviourService.setNormalBehaviour(key)
+		if (forAttempts > -1) {
+			logger.debug("FileId=$key: changed response behaviour. Will respond with ${fileResponse} for $forAttempts and then with default file afterwards")
+		} else {
+			logger.debug("FileId=$key: changed response behaviour. File fetch will respond with $fileResponse")
+		}
+
+		behaviourService.setFileResponse(key, fileResponse, forAttempts)
 
 		return ResponseEntity(HttpStatus.OK)
 	}
