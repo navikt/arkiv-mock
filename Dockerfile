@@ -1,4 +1,4 @@
-FROM ghcr.io/navikt/baseimages/temurin:17
+FROM gcr.io/distroless/java21-debian12:nonroot
 
 ENV SPRING_PROFILES_ACTIVE=docker
 ENV KAFKA_BROKERS=kafka-broker:29092

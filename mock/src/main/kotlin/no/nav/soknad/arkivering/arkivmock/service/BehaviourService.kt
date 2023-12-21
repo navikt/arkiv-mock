@@ -9,7 +9,6 @@ import no.nav.soknad.innsending.model.SoknadFile
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.ByteArrayOutputStream
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
 @Service
@@ -86,21 +85,21 @@ class BehaviourService(val objectMapper: ObjectMapper) {
 		return fileBehaviours.getOrDefault(key, FileResponse_Behaviour(FileResponses.One_MB, mockedException = null, forAttempts = -1, calls = 0 ))
 	}
 
-	fun getFile(key: String): SoknadFile {
-		val response = getFileResponse(key)
+	fun getFile(filId: String): SoknadFile {
+		val response = getFileResponse(filId)
 		response.calls += 1
-		fileBehaviours.put(key, response)
+		fileBehaviours.put(filId, response)
 
 		return if (response.forAttempts > response.calls) {
-			SoknadFile(fileStatus = SoknadFile.FileStatus.notfound, id = key, content = null, createdAt = null)
+			SoknadFile(fileStatus = SoknadFile.FileStatus.notfound, id = filId, content = null, createdAt = null)
 		} else 	if (response.behaviour == FileResponses.DELETED) {
-			SoknadFile(fileStatus = SoknadFile.FileStatus.deleted, id = key, content = null, createdAt = OffsetDateTime.now().minusHours(1L))
+			SoknadFile(fileStatus = SoknadFile.FileStatus.deleted, id = filId, content = null, createdAt = OffsetDateTime.now().minusHours(1L))
 		} else if (response.behaviour == FileResponses.NOT_FOUND) {
-			SoknadFile(fileStatus = SoknadFile.FileStatus.deleted, id = key, content = null, createdAt = OffsetDateTime.now().minusHours(1L))
+			SoknadFile(fileStatus = SoknadFile.FileStatus.deleted, id = filId, content = null, createdAt = OffsetDateTime.now().minusHours(1L))
 		} else {
 			SoknadFile(
 				fileStatus =  SoknadFile.FileStatus.ok,
-				id = key,
+				id = filId,
 				content = getBytesFromFile("/files/${response.behaviour.name}+.pdf"),
 				createdAt = OffsetDateTime.now().minusMinutes(1L)
 			)
