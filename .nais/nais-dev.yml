@@ -6,6 +6,7 @@ metadata:
   labels:
     team: team-soknad
   annotations:
+    nais.io/read-only-file-system: "false"
     nginx.ingress.kubernetes.io/proxy-body-size: "400M"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
 spec:
