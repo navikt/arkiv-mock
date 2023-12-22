@@ -31,9 +31,14 @@ class FileFetchTest {
 		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
 		Assertions.assertTrue(response.body != null)
 		val files = response.body
-		Assertions.assertEquals(1, files?.size)
-		Assertions.assertEquals(fileId, files?.first?.id)
-		Assertions.assertEquals(SoknadFile.FileStatus.ok, files?.first?.fileStatus)
+		if (files == null || files.isEmpty()) {
+			Assertions.assertTrue(false, "Expected body")
+		} else {
+			Assertions.assertEquals(1, files.size)
+			val fileResponse = files.get(0)
+			Assertions.assertEquals(fileId, fileResponse.id)
+			Assertions.assertEquals(SoknadFile.FileStatus.ok, fileResponse.fileStatus)
+		}
 	}
 
 
@@ -53,12 +58,12 @@ class FileFetchTest {
 		if (files == null || files.isEmpty() || files.size != 2) {
 			Assertions.assertTrue(false, "Expected 2 soknadFiles in response")
 		} else {
-			val deletedFile = files.filter { it.fileStatus == SoknadFile.FileStatus.deleted }.first
-			Assertions.assertEquals(fileId, deletedFile.id)
-			Assertions.assertTrue(deletedFile.content == null)
-			val okFile = files.filter { it.fileStatus == SoknadFile.FileStatus.ok }.first
-			Assertions.assertEquals(fileId2, okFile.id)
-			Assertions.assertTrue(okFile.content != null)
+			val deletedFile = files.filter { it.fileStatus == SoknadFile.FileStatus.deleted }.firstOrNull()
+			Assertions.assertEquals(fileId, deletedFile?.id)
+			Assertions.assertTrue(deletedFile?.content == null)
+			val okFile = files.filter { it.fileStatus == SoknadFile.FileStatus.ok }.firstOrNull()
+			Assertions.assertEquals(fileId2, okFile?.id)
+			Assertions.assertTrue(okFile?.content != null)
 		}
 	}
 
@@ -79,12 +84,12 @@ class FileFetchTest {
 		if (files == null || files.isEmpty() || files.size != 2) {
 			Assertions.assertTrue(false, "Expected 2 soknadFiles in response")
 		} else {
-			val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.notfound }.first
-			Assertions.assertEquals(fileId, notFoundFile.id)
-			Assertions.assertTrue(notFoundFile.content == null)
-			val okFile = files.filter { it.fileStatus == SoknadFile.FileStatus.ok }.first
-			Assertions.assertEquals(fileId2, okFile.id)
-			Assertions.assertTrue(okFile.content != null)
+			val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.notfound }.firstOrNull()
+			Assertions.assertEquals(fileId, notFoundFile?.id)
+			Assertions.assertTrue(notFoundFile?.content == null)
+			val okFile = files.filter { it.fileStatus == SoknadFile.FileStatus.ok }.firstOrNull()
+			Assertions.assertEquals(fileId2, okFile?.id)
+			Assertions.assertTrue(okFile?.content != null)
 		}
 	}
 
@@ -94,14 +99,14 @@ class FileFetchTest {
 
 		val key = UUID.randomUUID().toString()
 		val fileId = UUID.randomUUID().toString()
-		val noOfFailedAttempts: Int = 2
+		val noOfFailedAttempts = 2
 		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.DELETED.name, noOfFailedAttempts)
 
 		val responses = mutableListOf<ResponseEntity<List<SoknadFile>>>()
 		repeat(noOfFailedAttempts+1) {
 			responses.add( fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key))
 		}
-		var count: Int = 0
+		var count = 0
 		repeat(noOfFailedAttempts) {
 			val response = responses.get(count)
 			Assertions.assertEquals(HttpStatus.OK, response.statusCode)
@@ -110,24 +115,24 @@ class FileFetchTest {
 			if (files == null || files.isEmpty() || files.size != 1) {
 				Assertions.assertTrue(false, "Expected 1 soknadFile in response")
 			} else {
-				val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.deleted }.first
-				Assertions.assertEquals(fileId, notFoundFile.id)
-				Assertions.assertTrue(notFoundFile.content == null)
+				val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.deleted }.firstOrNull()
+				Assertions.assertEquals(fileId, notFoundFile?.id)
+				Assertions.assertTrue(notFoundFile?.content == null)
 			}
 
 			count += 1
 		}
 
-		val response = responses.last
+		val response = responses.get(noOfFailedAttempts+1)
 		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
 		Assertions.assertTrue(response.body != null)
 		val files = response.body
 		if (files == null || files.isEmpty() || files.size != 1) {
 			Assertions.assertTrue(false, "Expected 1 soknadFile in response")
 		} else {
-			val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.ok }.first
-			Assertions.assertEquals(fileId, notFoundFile.id)
-			Assertions.assertTrue(notFoundFile.content != null)
+			val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.ok }.firstOrNull()
+			Assertions.assertEquals(fileId, notFoundFile?.id)
+			Assertions.assertTrue(notFoundFile?.content != null)
 		}
 	}
 
@@ -152,24 +157,24 @@ class FileFetchTest {
 			if (files == null || files.isEmpty() || files.size != 1) {
 				Assertions.assertTrue(false, "Expected 1 soknadFile in response")
 			} else {
-				val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.notfound }.first
-				Assertions.assertEquals(fileId, notFoundFile.id)
-				Assertions.assertTrue(notFoundFile.content == null)
+				val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.notfound }.firstOrNull()
+				Assertions.assertEquals(fileId, notFoundFile?.id)
+				Assertions.assertTrue(notFoundFile?.content == null)
 			}
 
 			count += 1
 		}
 
-		val response = responses.last
+		val response = responses.get(noOfFailedAttempts+1)
 		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
 		Assertions.assertTrue(response.body != null)
 		val files = response.body
 		if (files == null || files.isEmpty() || files.size != 1) {
 			Assertions.assertTrue(false, "Expected 1 soknadFile in response")
 		} else {
-			val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.ok }.first
-			Assertions.assertEquals(fileId, notFoundFile.id)
-			Assertions.assertTrue(notFoundFile.content != null)
+			val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.ok }.firstOrNull()
+			Assertions.assertEquals(fileId, notFoundFile?.id)
+			Assertions.assertTrue(notFoundFile?.content != null)
 		}
 	}
 
