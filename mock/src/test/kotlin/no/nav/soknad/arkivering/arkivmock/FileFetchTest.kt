@@ -123,7 +123,7 @@ class FileFetchTest {
 			count += 1
 		}
 
-		val response = responses.get(noOfFailedAttempts+1)
+		val response = responses.get(noOfFailedAttempts)
 		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
 		Assertions.assertTrue(response.body != null)
 		val files = response.body
@@ -165,7 +165,7 @@ class FileFetchTest {
 			count += 1
 		}
 
-		val response = responses.get(noOfFailedAttempts+1)
+		val response = responses.get(noOfFailedAttempts)
 		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
 		Assertions.assertTrue(response.body != null)
 		val files = response.body
