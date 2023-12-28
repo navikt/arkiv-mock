@@ -35,15 +35,14 @@
 		<mockk.version>1.13.3</mockk.version>
 		<graphql-kotlin.version>6.5.3</graphql-kotlin.version>
 		<!--OpenAPI-->
-		<springdoc-openapi.version>1.7.0</springdoc-openapi.version>
-		<swagger-annotations.version>2.2.15</swagger-annotations.version>
-		<openapi-generator-maven-plugin.version>7.0.0</openapi-generator-maven-plugin.version>
+		<springdoc-openapi.version>2.3.0</springdoc-openapi.version>
+		<swagger-annotations.version>2.2.19</swagger-annotations.version>
+		<openapi-generator-maven-plugin.version>7.1.0</openapi-generator-maven-plugin.version>
 
 		<okhttp3.version>4.11.0</okhttp3.version>
-		<springdoc.version>1.7.0</springdoc.version>
 
-		<java.version>17</java.version>
-		<kotlin.version>1.7.22</kotlin.version>
+		<java.version>21</java.version>
+		<kotlin.version>1.9.21</kotlin.version>
 		<kotlin-serialization.version>1.5.1</kotlin-serialization.version>
 	</properties>
 
