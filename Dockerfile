@@ -5,7 +5,7 @@ ENV LANG='nb_NO.UTF-8' LANGUAGE='nb_NO:nb' LC_ALL='nb:NO.UTF-8' TZ="Europe/Oslo"
 
 ENV KAFKA_BROKERS=kafka-broker:29092
 
-COPY target/*.jar app.jar
+COPY mock/target/*.jar /app/app.jar
 
 WORKDIR /app
 
