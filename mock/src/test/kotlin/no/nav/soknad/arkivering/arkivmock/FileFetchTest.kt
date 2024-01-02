@@ -43,6 +43,30 @@ class FileFetchTest {
 
 
 	@Test
+	fun `Responds with file status ok and 100KB file when this behaviour is specified`() {
+
+		val key = UUID.randomUUID().toString()
+		val fileId = UUID.randomUUID().toString()
+
+		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.OneHundred_KB.name)
+
+		val response = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
+
+		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
+		Assertions.assertTrue(response.body != null)
+		val files = response.body
+		if (files == null || files.isEmpty()) {
+			Assertions.assertTrue(false, "Expected body")
+		} else {
+			Assertions.assertEquals(1, files.size)
+			val fileResponse = files.get(0)
+			Assertions.assertEquals(fileId, fileResponse.id)
+			Assertions.assertEquals(SoknadFile.FileStatus.ok, fileResponse.fileStatus)
+		}
+	}
+
+
+	@Test
 	fun `Responds with file status deleted when this behaviour is set`() {
 
 		val key = UUID.randomUUID().toString()
