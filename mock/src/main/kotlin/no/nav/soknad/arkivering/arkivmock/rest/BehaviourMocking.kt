@@ -41,6 +41,17 @@ class BehaviourMocking(val behaviourService: BehaviourService, val fileMockServi
 		return ResponseEntity(HttpStatus.OK)
 	}
 
+
+	@PutMapping("/set-delay-behaviour/{key}")
+	fun mockDelayedOkResponseBehaviour(@PathVariable("key") key: String): ResponseEntity<String> {
+		logger.debug("$key: will delay and return http status ${HttpStatus.OK}")
+
+		behaviourService.setDelayBehaviour(key)
+
+		return ResponseEntity(HttpStatus.OK)
+	}
+
+
 	@PutMapping("/set-normal-behaviour/{key}")
 	fun setNormalResponseBehaviour(@PathVariable("key") key: String): ResponseEntity<String> {
 		logger.debug("$key: will accept all calls and return http status ${HttpStatus.OK}")

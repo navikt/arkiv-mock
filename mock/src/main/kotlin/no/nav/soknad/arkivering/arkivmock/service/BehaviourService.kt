@@ -22,6 +22,11 @@ class BehaviourService(val objectMapper: ObjectMapper) {
 		behaviours[key] = BehaviourDto(NORMAL, null, -1, calls)
 	}
 
+	fun setDelayBehaviour(key: String) {
+		val calls = behaviours[key]?.calls ?: 0
+		behaviours[key] = BehaviourDto(DELAYED_NORMAL, null, 3, calls)
+	}
+
 	fun mockException(key: String, statusCode: Int, forAttempts: Int) {
 		val calls = behaviours[key]?.calls ?: 0
 
@@ -52,7 +57,12 @@ class BehaviourService(val objectMapper: ObjectMapper) {
 		if (behaviour.behaviour == MOCK_EXCEPTION && behaviour.calls <= behaviour.forAttempts && behaviour.mockedException != null) {
 			logger.info("$key: will return exception for key.")
 			throw behaviour.mockedException as Exception
+		} else if (behaviour.behaviour == DELAYED_NORMAL) {
+			logger.info("$key: delay response.")
+			if (behaviour.calls < behaviour.forAttempts)
+				Thread.sleep(4*60*1002L)
 		}
+
 	}
 
 	fun alterResponse(key: String, response: OpprettJournalpostResponse): String? {
@@ -84,7 +94,7 @@ data class BehaviourDto(
 	var calls: Int = 0
 )
 
-enum class BEHAVIOUR { NORMAL, MOCK_EXCEPTION, RESPOND_WITH_ERRONEOUS_BODY }
+enum class BEHAVIOUR { NORMAL, MOCK_EXCEPTION, RESPOND_WITH_ERRONEOUS_BODY, DELAYED_NORMAL }
 
 enum class FileResponses {	OneHundred_KB, One_MB, Ten_MB,	Fifty_50_MB,	DELETED,	NOT_FOUND }
 

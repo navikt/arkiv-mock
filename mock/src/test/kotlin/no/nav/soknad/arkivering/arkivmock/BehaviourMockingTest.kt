@@ -8,11 +8,8 @@ import no.nav.soknad.arkivering.arkivmock.exceptions.InternalServerErrorExceptio
 import no.nav.soknad.arkivering.arkivmock.exceptions.NotFoundException
 import no.nav.soknad.arkivering.arkivmock.rest.ArkivRestInterface
 import no.nav.soknad.arkivering.arkivmock.rest.BehaviourMocking
-import no.nav.soknad.arkivering.arkivmock.rest.InnsendingApiRestInterface
-import no.nav.soknad.arkivering.arkivmock.service.FileResponses
 import no.nav.soknad.arkivering.arkivmock.service.kafka.KafkaPublisher
-import no.nav.soknad.innsending.model.SoknadFile
-import no.nav.soknad.innsending.model.SoknadsStatusDto
+import org.junit.Ignore
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -21,7 +18,6 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -52,6 +48,30 @@ class BehaviourMockingTest {
 		assertTrue(response.body!!.contains("\",\"journalpostferdigstilt\":true,\"journalstatus\":\"MIDLERTIDIG\",\"melding\":\"null\"}"))
 		verify(timeout = 1000, exactly = 1) { kafkaPublisher.putNumberOfCallsOnTopic(eq(id), eq(1), any()) }
 		verify(timeout = 1000, exactly = 1) { kafkaPublisher.putDataOnTopic(eq(id), any(), any()) }
+	}
+
+	@Test
+	@Ignore // This test takes more than 8 minutes to run.
+	fun `Delay ok response - Will broadcast on Kafka`() {
+		behaviourMocking.mockDelayedOkResponseBehaviour(id)
+
+		for (i in (0..1)) {
+			val start = System.currentTimeMillis()
+			val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
+			val responseTime = System.currentTimeMillis() - start
+			assertTrue(responseTime > 4*60*1000L)
+		}
+
+		val start = System.currentTimeMillis()
+		val response = arkivRestInterface.receiveJournalpost(createRequestData(id))
+		val responseTime = System.currentTimeMillis() - start
+		assertTrue(responseTime < 4000L)
+
+		assertEquals(HttpStatus.OK, response.statusCode)
+		assertTrue(response.body!!.contains("{\"dokumenter\":[],\"journalpostId\":\""))
+		assertTrue(response.body!!.contains("\",\"journalpostferdigstilt\":true,\"journalstatus\":\"MIDLERTIDIG\",\"melding\":\"null\"}"))
+		verify(timeout = 1000, exactly = 1) { kafkaPublisher.putNumberOfCallsOnTopic(eq(id), eq(1), any()) }
+		verify(timeout = 10000, exactly = 3) { kafkaPublisher.putDataOnTopic(eq(id), any(), any()) }
 	}
 
 	@Test

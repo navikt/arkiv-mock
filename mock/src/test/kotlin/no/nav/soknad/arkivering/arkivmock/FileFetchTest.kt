@@ -26,19 +26,11 @@ class FileFetchTest {
 		val key = UUID.randomUUID().toString()
 		val fileId = UUID.randomUUID().toString()
 
+		// When
 		val response = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
 
-		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
-		Assertions.assertTrue(response.body != null)
-		val files = response.body
-		if (files == null || files.isEmpty()) {
-			Assertions.assertTrue(false, "Expected body")
-		} else {
-			Assertions.assertEquals(1, files.size)
-			val fileResponse = files.get(0)
-			Assertions.assertEquals(fileId, fileResponse.id)
-			Assertions.assertEquals(SoknadFile.FileStatus.ok, fileResponse.fileStatus)
-		}
+		// Then
+		assertFileStatus(response, fileId, SoknadFile.FileStatus.ok )
 	}
 
 
@@ -48,21 +40,14 @@ class FileFetchTest {
 		val key = UUID.randomUUID().toString()
 		val fileId = UUID.randomUUID().toString()
 
+		// Given
 		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.OneHundred_KB.name)
 
+		// When
 		val response = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
 
-		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
-		Assertions.assertTrue(response.body != null)
-		val files = response.body
-		if (files == null || files.isEmpty()) {
-			Assertions.assertTrue(false, "Expected body")
-		} else {
-			Assertions.assertEquals(1, files.size)
-			val fileResponse = files.get(0)
-			Assertions.assertEquals(fileId, fileResponse.id)
-			Assertions.assertEquals(SoknadFile.FileStatus.ok, fileResponse.fileStatus)
-		}
+		// Then
+		assertFileStatus(response, fileId, SoknadFile.FileStatus.ok )
 	}
 
 	@Test
@@ -71,21 +56,14 @@ class FileFetchTest {
 		val key = UUID.randomUUID().toString()
 		val fileId = UUID.randomUUID().toString()
 
+		// Given
 		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.Fifty_50_MB.name)
 
+		// When
 		val response = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
 
-		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
-		Assertions.assertTrue(response.body != null)
-		val files = response.body
-		if (files == null || files.isEmpty()) {
-			Assertions.assertTrue(false, "Expected body")
-		} else {
-			Assertions.assertEquals(1, files.size)
-			val fileResponse = files.get(0)
-			Assertions.assertEquals(fileId, fileResponse.id)
-			Assertions.assertEquals(SoknadFile.FileStatus.ok, fileResponse.fileStatus)
-		}
+		// Then
+		assertFileStatus(response, fileId, SoknadFile.FileStatus.ok )
 	}
 
 
@@ -95,34 +73,74 @@ class FileFetchTest {
 		val key = UUID.randomUUID().toString()
 		val fileId = UUID.randomUUID().toString()
 
+		// given
 		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.Fifty_50_MB.name)
 
+		// when
 		val response = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
 
-		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
-		Assertions.assertTrue(response.body != null)
-		val files = response.body
+		// then
+		assertFileStatus(response, fileId, SoknadFile.FileStatus.ok )
+
+	}
+
+
+	@Test
+	fun `Responds with file status ok and 50MB file on third attempt`() {
+
+		val key = UUID.randomUUID().toString()
+		val fileId = UUID.randomUUID().toString()
+
+		// Given
+		val noOfFailedAttempts = 2
+		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.Fifty_50_MB.name, noOfFailedAttempts)
+
+		// when
+		val response1 = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
+		val response2 = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
+		val response3 = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
+
+		// then
+		assertFileStatus(response1, fileId, SoknadFile.FileStatus.notfound)
+		assertFileStatus(response2, fileId, SoknadFile.FileStatus.notfound )
+		assertFileStatus(response3, fileId, SoknadFile.FileStatus.ok )
+
+	}
+
+	private fun assertFileStatus(
+		response1: ResponseEntity<List<SoknadFile>>,
+		fileId: String,
+		fileStatus: SoknadFile.FileStatus
+	) {
+		Assertions.assertEquals(HttpStatus.OK, response1.statusCode)
+		Assertions.assertTrue(response1.body != null)
+		val files = response1.body
 		if (files == null || files.isEmpty()) {
 			Assertions.assertTrue(false, "Expected body")
 		} else {
 			Assertions.assertEquals(1, files.size)
 			val fileResponse = files.get(0)
 			Assertions.assertEquals(fileId, fileResponse.id)
-			Assertions.assertEquals(SoknadFile.FileStatus.ok, fileResponse.fileStatus)
+			Assertions.assertEquals(fileStatus, fileResponse.fileStatus)
 		}
 	}
 
 
 	@Test
-	fun `Responds with file status deleted when this behaviour is set`() {
+	fun `For two files responds with one file status ok and one deleted when this behaviour is set`() {
 
 		val key = UUID.randomUUID().toString()
 		val fileId = UUID.randomUUID().toString()
 		val fileId2 = UUID.randomUUID().toString()
-		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.DELETED.name)
 
+		// given
+		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.DELETED.name)
+		fileFetchBehaviour.setFileResponseBehaviour(fileId2, FileResponses.One_MB.name)
+
+		// when
 		val response = fillagerRestInterface.hentInnsendteFiler(listOf(fileId, fileId2), key)
 
+		// then
 		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
 		Assertions.assertTrue(response.body != null)
 		val files = response.body
@@ -140,15 +158,20 @@ class FileFetchTest {
 
 
 	@Test
-	fun `Responds with file status not-found when this behaviour is set`() {
+	fun `For two files responds with file status ok and file status not-found when this behaviour is set`() {
 
 		val key = UUID.randomUUID().toString()
 		val fileId = UUID.randomUUID().toString()
 		val fileId2 = UUID.randomUUID().toString()
+
+		// When
+		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.One_MB.name)
 		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.NOT_FOUND.name)
 
+		// Given
 		val response = fillagerRestInterface.hentInnsendteFiler(listOf(fileId, fileId2), key)
 
+		// Then
 		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
 		Assertions.assertTrue(response.body != null)
 		val files = response.body
