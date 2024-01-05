@@ -97,9 +97,18 @@ data class BehaviourDto(
 enum class BEHAVIOUR { NORMAL, MOCK_EXCEPTION, RESPOND_WITH_ERRONEOUS_BODY, DELAYED_NORMAL }
 
 enum class FileResponses {	OneHundred_KB, One_MB, Ten_MB,	Fifty_50_MB,	DELETED,	NOT_FOUND }
+enum class SafResponses {	OK,	NOT_FOUND }
 
 data class FileResponse_Behaviour(
 	var behaviour: FileResponses = FileResponses.One_MB,
+	var mockedException: Exception? = null,
+	var forAttempts: Int = -1,
+	var calls: Int = 0
+)
+
+
+data class SafResponse_Behaviour(
+	var behaviour: SafResponses = SafResponses.NOT_FOUND,
 	var mockedException: Exception? = null,
 	var forAttempts: Int = -1,
 	var calls: Int = 0
