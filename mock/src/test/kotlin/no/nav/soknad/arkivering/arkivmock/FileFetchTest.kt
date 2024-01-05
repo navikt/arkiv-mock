@@ -57,7 +57,7 @@ class FileFetchTest {
 		val fileId = UUID.randomUUID().toString()
 
 		// Given
-		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.Fifty_50_MB.name)
+		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.Ten_MB.name)
 
 		// When
 		val response = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
@@ -116,7 +116,7 @@ class FileFetchTest {
 		Assertions.assertTrue(response1.body != null)
 		val files = response1.body
 		if (files == null || files.isEmpty()) {
-			Assertions.assertTrue(false, "Expected body")
+			throw RuntimeException("Response body is empty!")
 		} else {
 			Assertions.assertEquals(1, files.size)
 			val fileResponse = files.get(0)
@@ -125,6 +125,22 @@ class FileFetchTest {
 		}
 	}
 
+	private fun assertResponse(
+		response: ResponseEntity<List<SoknadFile>>,
+		expectedFileIdStatusMap: Map<String, SoknadFile.FileStatus>
+	) {
+		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
+		Assertions.assertTrue(response.body != null)
+		val files = response.body
+		if (files == null || files.isEmpty() || files.size != expectedFileIdStatusMap.size) {
+			throw java.lang.RuntimeException("Expected ${expectedFileIdStatusMap.size} soknadFiles in response, got empty body or wrong number soknadFiles")
+		} else {
+			expectedFileIdStatusMap.forEach{ fileid, status ->  Assertions.assertTrue(files.filter {
+				it.id == fileid && it.fileStatus == status &&
+					((status == SoknadFile.FileStatus.ok && it.content != null) || (status != SoknadFile.FileStatus.ok && it.content == null) )}.firstOrNull() != null )}
+		}
+
+	}
 
 	@Test
 	fun `For two files responds with one file status ok and one deleted when this behaviour is set`() {
@@ -141,19 +157,8 @@ class FileFetchTest {
 		val response = fillagerRestInterface.hentInnsendteFiler(listOf(fileId, fileId2), key)
 
 		// then
-		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
-		Assertions.assertTrue(response.body != null)
-		val files = response.body
-		if (files == null || files.isEmpty() || files.size != 2) {
-			Assertions.assertTrue(false, "Expected 2 soknadFiles in response")
-		} else {
-			val deletedFile = files.filter { it.fileStatus == SoknadFile.FileStatus.deleted }.firstOrNull()
-			Assertions.assertEquals(fileId, deletedFile?.id)
-			Assertions.assertTrue(deletedFile?.content == null)
-			val okFile = files.filter { it.fileStatus == SoknadFile.FileStatus.ok }.firstOrNull()
-			Assertions.assertEquals(fileId2, okFile?.id)
-			Assertions.assertTrue(okFile?.content != null)
-		}
+		assertResponse(response = response,
+			expectedFileIdStatusMap = mapOf(fileId to SoknadFile.FileStatus.deleted, fileId2 to SoknadFile.FileStatus.ok))
 	}
 
 
@@ -166,25 +171,15 @@ class FileFetchTest {
 
 		// When
 		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.One_MB.name)
-		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.NOT_FOUND.name)
+		fileFetchBehaviour.setFileResponseBehaviour(fileId2, FileResponses.NOT_FOUND.name)
 
 		// Given
 		val response = fillagerRestInterface.hentInnsendteFiler(listOf(fileId, fileId2), key)
 
 		// Then
-		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
-		Assertions.assertTrue(response.body != null)
-		val files = response.body
-		if (files == null || files.isEmpty() || files.size != 2) {
-			Assertions.assertTrue(false, "Expected 2 soknadFiles in response")
-		} else {
-			val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.notfound }.firstOrNull()
-			Assertions.assertEquals(fileId, notFoundFile?.id)
-			Assertions.assertTrue(notFoundFile?.content == null)
-			val okFile = files.filter { it.fileStatus == SoknadFile.FileStatus.ok }.firstOrNull()
-			Assertions.assertEquals(fileId2, okFile?.id)
-			Assertions.assertTrue(okFile?.content != null)
-		}
+		assertResponse(response = response,
+			expectedFileIdStatusMap = mapOf(fileId2 to SoknadFile.FileStatus.notfound, fileId to SoknadFile.FileStatus.ok))
+
 	}
 
 
@@ -193,41 +188,21 @@ class FileFetchTest {
 
 		val key = UUID.randomUUID().toString()
 		val fileId = UUID.randomUUID().toString()
+
+		// When
 		val noOfFailedAttempts = 2
 		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.DELETED.name, noOfFailedAttempts)
 
-		val responses = mutableListOf<ResponseEntity<List<SoknadFile>>>()
-		repeat(noOfFailedAttempts+1) {
-			responses.add( fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key))
-		}
-		var count = 0
-		repeat(noOfFailedAttempts) {
-			val response = responses.get(count)
-			Assertions.assertEquals(HttpStatus.OK, response.statusCode)
-			Assertions.assertTrue(response.body != null)
-			val files = response.body
-			if (files == null || files.isEmpty() || files.size != 1) {
-				Assertions.assertTrue(false, "Expected 1 soknadFile in response")
-			} else {
-				val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.deleted }.firstOrNull()
-				Assertions.assertEquals(fileId, notFoundFile?.id)
-				Assertions.assertTrue(notFoundFile?.content == null)
-			}
+		// Given
+		val response1 = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
+		val response2 = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
+		val response3 = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
 
-			count += 1
-		}
+		// Then
+		assertResponse(response = response1,expectedFileIdStatusMap = mapOf(fileId to SoknadFile.FileStatus.deleted))
+		assertResponse(response = response2,expectedFileIdStatusMap = mapOf(fileId to SoknadFile.FileStatus.deleted))
+		assertResponse(response = response3,expectedFileIdStatusMap = mapOf(fileId to SoknadFile.FileStatus.ok))
 
-		val response = responses.get(noOfFailedAttempts)
-		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
-		Assertions.assertTrue(response.body != null)
-		val files = response.body
-		if (files == null || files.isEmpty() || files.size != 1) {
-			Assertions.assertTrue(false, "Expected 1 soknadFile in response")
-		} else {
-			val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.ok }.firstOrNull()
-			Assertions.assertEquals(fileId, notFoundFile?.id)
-			Assertions.assertTrue(notFoundFile?.content != null)
-		}
 	}
 
 	@Test
@@ -235,41 +210,20 @@ class FileFetchTest {
 
 		val key = UUID.randomUUID().toString()
 		val fileId = UUID.randomUUID().toString()
+
+		// When
 		val noOfFailedAttempts: Int = 2
 		fileFetchBehaviour.setFileResponseBehaviour(fileId, FileResponses.NOT_FOUND.name, noOfFailedAttempts)
 
-		val responses = mutableListOf<ResponseEntity<List<SoknadFile>>>()
-		repeat(noOfFailedAttempts+1) {
-			responses.add( fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key))
-		}
-		var count: Int = 0
-		repeat(noOfFailedAttempts) {
-			val response = responses.get(count)
-			Assertions.assertEquals(HttpStatus.OK, response.statusCode)
-			Assertions.assertTrue(response.body != null)
-			val files = response.body
-			if (files == null || files.isEmpty() || files.size != 1) {
-				Assertions.assertTrue(false, "Expected 1 soknadFile in response")
-			} else {
-				val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.notfound }.firstOrNull()
-				Assertions.assertEquals(fileId, notFoundFile?.id)
-				Assertions.assertTrue(notFoundFile?.content == null)
-			}
+		// Given
+		val response1 = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
+		val response2 = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
+		val response3 = fillagerRestInterface.hentInnsendteFiler(listOf(fileId), key)
 
-			count += 1
-		}
-
-		val response = responses.get(noOfFailedAttempts)
-		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
-		Assertions.assertTrue(response.body != null)
-		val files = response.body
-		if (files == null || files.isEmpty() || files.size != 1) {
-			Assertions.assertTrue(false, "Expected 1 soknadFile in response")
-		} else {
-			val notFoundFile = files.filter { it.fileStatus == SoknadFile.FileStatus.ok }.firstOrNull()
-			Assertions.assertEquals(fileId, notFoundFile?.id)
-			Assertions.assertTrue(notFoundFile?.content != null)
-		}
+		// Then
+		assertResponse(response = response1,expectedFileIdStatusMap = mapOf(fileId to SoknadFile.FileStatus.notfound))
+		assertResponse(response = response2,expectedFileIdStatusMap = mapOf(fileId to SoknadFile.FileStatus.notfound))
+		assertResponse(response = response3,expectedFileIdStatusMap = mapOf(fileId to SoknadFile.FileStatus.ok))
 	}
 
 }

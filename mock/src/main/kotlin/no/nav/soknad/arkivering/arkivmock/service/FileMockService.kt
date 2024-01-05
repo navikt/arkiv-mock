@@ -24,15 +24,19 @@ class FileMockService {
 		response.calls += 1
 		fileBehaviours.put(filId, response)
 
+		// For henting av en fil kan det være satt opp at responsen skal gi feil, enten not-found eller deleted, x antall attempt før default respons.
+		// Hvis antall kall utført for å hente fil er mindre enn antall attempts spesifisert skal deleted eller not-found respons returneres.
 		if (response.forAttempts >= response.calls) {
 			return SoknadFile(
 				fileStatus = if (response.behaviour == FileResponses.DELETED) SoknadFile.FileStatus.deleted else SoknadFile.FileStatus.notfound, id = filId,
 				content = null, createdAt = null)
 		}
 
+		// Hvis det er satt opp at det skal være noen feil attempts før ok respons, og dette antallet er nådd, sett default fil respons
 		if (response.forAttempts > -1 )
 			response.behaviour = FileResponses.One_MB
 
+		// Returner iht. konfigureringen i response objektet.
 		return when (response.behaviour) {
 			FileResponses.DELETED -> {
 				SoknadFile(fileStatus = SoknadFile.FileStatus.deleted, id = filId, content = null, createdAt = OffsetDateTime.now().minusHours(1L))
