@@ -2,8 +2,7 @@ package no.nav.soknad.arkivering.arkivmock.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.soknad.arkivering.arkivmock.dto.OpprettJournalpostResponse
-import no.nav.soknad.arkivering.arkivmock.exceptions.InternalServerErrorException
-import no.nav.soknad.arkivering.arkivmock.exceptions.NotFoundException
+import no.nav.soknad.arkivering.arkivmock.exceptions.*
 import no.nav.soknad.arkivering.arkivmock.service.BEHAVIOUR.*
 import no.nav.soknad.innsending.model.SoknadFile
 import org.slf4j.LoggerFactory
@@ -32,8 +31,11 @@ class BehaviourService(val objectMapper: ObjectMapper) {
 
 		val mockedException = when (statusCode) {
 			404  -> NotFoundException()
+			408 ->  TimeoutException()
+			409 ->  ConflictException()
+			410 ->  GoneException()
 			500  -> InternalServerErrorException()
-			else -> RuntimeException("Not implemented")
+			else -> RuntimeException("Not implemented $statusCode")
 		}
 
 		behaviours[key] = BehaviourDto(MOCK_EXCEPTION, mockedException, forAttempts, calls)

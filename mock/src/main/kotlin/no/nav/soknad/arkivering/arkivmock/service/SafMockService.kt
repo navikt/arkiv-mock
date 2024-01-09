@@ -3,15 +3,18 @@ package no.nav.soknad.arkivering.arkivmock.service
 import com.expediagroup.graphql.client.types.GraphQLClientError
 import com.expediagroup.graphql.client.types.GraphQLClientResponse
 import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.soknad.arkivering.saf.generated.HentJournalpostGittEksternReferanseId
 import no.nav.soknad.arkivering.saf.generated.enums.*
 import no.nav.soknad.arkivering.saf.generated.hentjournalpostgitteksternreferanseid.AvsenderMottaker
 import no.nav.soknad.arkivering.saf.generated.hentjournalpostgitteksternreferanseid.Bruker
 import no.nav.soknad.arkivering.saf.generated.hentjournalpostgitteksternreferanseid.Journalpost
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
 
 @Service
 class SafMockService {
+	private val logger = LoggerFactory.getLogger(javaClass)
 
 	private val safBehaviours: MutableMap<String, SafResponse_Behaviour> = mutableMapOf()
 
@@ -19,14 +22,14 @@ class SafMockService {
 		safBehaviours.put(key, SafResponse_Behaviour(behaviour = SafResponses.valueOf(response), forAttempts = forAttempts))
 	}
 
-	fun getSafResponse(key: String): SafResponse_Behaviour {
+	fun getSafResponseBehaviour(key: String): SafResponse_Behaviour {
 		return safBehaviours.getOrDefault(key, SafResponse_Behaviour(SafResponses.NOT_FOUND, mockedException = null, forAttempts = -1, calls = 0 ))
 	}
 
 
 	fun get(key: String): String {
 
-		val response = getSafResponse(key)
+		val response = getSafResponseBehaviour(key)
 		response.calls += 1
 		safBehaviours.put(key, response)
 
@@ -53,36 +56,41 @@ class SafMockService {
 
 	private fun createSafResponse_withJournalpost(innsendingsId: String): String
 	{
+		logger.info("$innsendingsId: ***SAF returner journalpost****")
 		val objectMapper = ObjectMapper()
 		return objectMapper.writeValueAsString(
-			graphQlResponse(data = buildJournalpost(innsendingsId), errors = null, extensions = null))
+			GraphQlResponse(data = HentJournalpostGittEksternReferanseId.Result(journalpost = buildJournalpost(innsendingsId)), errors = null, extensions = null)
+		)
 	}
 
 	private fun createSafResponse_withoutJournalpost(innsendingsId: String): String
 	{
+		logger.info("$innsendingsId: -----SAF returner tom journalpost-----")
 		val objectMapper = ObjectMapper()
 		return objectMapper.writeValueAsString(
-			graphQlResponse(data = null, errors = null, extensions = null))
+			HentJournalpostGittEksternReferanseId.Result(journalpost = null)
+		)
 	}
 
-	data class graphQlResponse<Journalpost> (
-		override val data: Journalpost? = null,
+	data class GraphQlResponse(
+		override val data: HentJournalpostGittEksternReferanseId.Result? = null,
 		override val errors: List<GraphQLClientError>? = null,
 		override val extensions: Map<String, Any?>? = null
-	): GraphQLClientResponse<Journalpost>
+	): GraphQLClientResponse<HentJournalpostGittEksternReferanseId.Result>
 
 	fun buildJournalpost(key: String): Journalpost {
 		return Journalpost(
-			journalpostId = "12345678",
-			tittel = "Journalposttittel",
+			journalpostId = "12345",
+			tittel = "Test søknad",
 			journalposttype = Journalposttype.I,
 			journalstatus = Journalstatus.MOTTATT,
-			tema = Tema.AAP,
-			bruker = Bruker(id = "12345678901", type = BrukerIdType.FNR),
-			avsenderMottaker = AvsenderMottaker(id = "12345678901", AvsenderMottakerIdType.FNR),
-			datoOpprettet =  OffsetDateTime.now().toInstant().toString(),
+			tema = Tema.BID,
+			bruker = Bruker("12345678901", BrukerIdType.FNR),
+			avsenderMottaker = AvsenderMottaker("12345678901", type = AvsenderMottakerIdType.FNR),
+			datoOpprettet = OffsetDateTime.now().toInstant().toString(),
 			eksternReferanseId = key
 		)
+
 	}
 
 }

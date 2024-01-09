@@ -11,7 +11,11 @@ import no.nav.soknad.arkivering.arkivmock.config.Constants.CORRELATION_ID
 import no.nav.soknad.arkivering.arkivmock.config.Constants.HEADER_CALL_ID
 import no.nav.soknad.arkivering.arkivmock.config.Constants.NAV_CONSUMER_ID
 import no.nav.soknad.arkivering.arkivmock.service.SafMockService
+import no.nav.soknad.arkivering.saf.generated.HentJournalpostGittEksternReferanseId
+import org.springframework.http.MediaType
+import org.springframework.util.MultiValueMapAdapter
 import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.reactive.function.client.ClientResponse
 
 @RestController
 @Protected
@@ -22,15 +26,18 @@ class SafRestInterface(val safMockService: SafMockService) {
 	private final val X_CORRELATION_ID: String  = "x_correlationId"
 
 	@PostMapping(value =  ["/graphql", "/graphql/"])
-		fun getJournalpost(
-			@RequestHeader(value = CORRELATION_ID, required = false) xCorrelationId: String?,
-			@RequestHeader(value = HEADER_CALL_ID, required = false) xCallId: String?,
-			@RequestHeader(value = NAV_CONSUMER_ID, required = false) xNavUserId: String?,
-			@RequestBody request: GraphQLRequest): ResponseEntity<String> {
+	fun getJournalpost(
+		@RequestHeader(value = CORRELATION_ID, required = false) xCorrelationId: String?,
+		@RequestHeader(value = HEADER_CALL_ID, required = false) xCallId: String?,
+		@RequestHeader(value = NAV_CONSUMER_ID, required = false) xNavUserId: String?,
+		@RequestBody request: GraphQLRequest): ResponseEntity<String> {
 
-		val key = request.variables().get("eksternReferanseId").toString()
+		val key = request.variables().get("eksternReferanseId")
 		logger.info("$key: SAF request journalpost")
 
-		return ResponseEntity(safMockService.get(key), HttpStatus.OK)
+		val keyValueList = mapOf("Content-Type" to mutableListOf(MediaType.APPLICATION_JSON_VALUE))
+		val mvm = MultiValueMapAdapter(keyValueList)
+
+		return ResponseEntity(safMockService.get(key as String),mvm, HttpStatus.OK)
 	}
 }

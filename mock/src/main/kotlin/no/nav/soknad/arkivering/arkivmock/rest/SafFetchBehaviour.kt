@@ -24,7 +24,7 @@ class SafFetchBehaviour(val safMockService: SafMockService) {
 	): ResponseEntity<String> {
 
 		if (forAttempts > -1) {
-			logger.debug("$key: changed SAF response behaviour. Will respond with ${safResponse} for the first $forAttempts and then with status ok and default file afterwards")
+			logger.debug("$key: changed SAF response behaviour. Will respond with ${safResponse} for the first $forAttempts and then with changed status afterwards")
 		} else {
 			logger.debug("$key: changed SAF response behaviour. SAF fetch will respond with $safResponse")
 		}

@@ -37,7 +37,7 @@ class SafInterfaceTest {
 
 		// Then
 		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
-		Assertions.assertTrue(response.body!!.contains("{\"data\":null,\"errors\":null,\"extensions\":null}"))
+		Assertions.assertTrue(response.body!!.contains("{\"journalpost\":null}"))
 	}
 
 	@Test
@@ -79,7 +79,7 @@ class SafInterfaceTest {
 
 		// Then
 		Assertions.assertEquals(HttpStatus.OK, response1.statusCode)
-		Assertions.assertTrue(response1.body!!.contains("{\"data\":null,\"errors\":null,\"extensions\":null}"))
+		Assertions.assertTrue(response1.body!!.contains("{\"journalpost\":null}"))
 		Assertions.assertEquals(HttpStatus.OK, response2.statusCode)
 		val body = response2.body
 		Assertions.assertTrue(body != null && body.contains(eksternReferanseId))
