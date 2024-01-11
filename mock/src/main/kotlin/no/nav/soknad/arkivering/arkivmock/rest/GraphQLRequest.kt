@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 
 class GraphQLRequest(
-	@param:JsonProperty("query") private val query: String,
-	@param:JsonProperty("operationName") private val operationName: String,
+	@param:JsonProperty("query") private val query: String?,
+	@param:JsonProperty("operationName") private val operationName: String?,
 	@param:JsonProperty("variables") private val variables: Map<String, Any>
 ) {
 

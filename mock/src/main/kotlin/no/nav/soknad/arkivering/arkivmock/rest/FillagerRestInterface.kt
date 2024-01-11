@@ -1,6 +1,8 @@
 package no.nav.soknad.arkivering.arkivmock.rest
 
 import no.nav.security.token.support.core.api.Protected
+import no.nav.soknad.arkivering.arkivmock.service.BehaviourService
+import no.nav.soknad.arkivering.arkivmock.service.FileMockService
 import org.springframework.web.bind.annotation.RestController
 import no.nav.soknad.innsending.api.InnsendteApi
 import no.nav.soknad.innsending.model.AktivSakDto
@@ -12,7 +14,7 @@ import org.springframework.http.ResponseEntity
 
 @RestController
 @Protected
-class InnsendingApiRestInterface(): InnsendteApi
+class InnsendingApiRestInterface(val fileMockService: FileMockService): InnsendteApi
 {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -30,7 +32,7 @@ class InnsendingApiRestInterface(): InnsendteApi
 		logger.info("$xInnsendingId: Kall for å hente filene $uuids til en innsendt søknad")
 
 		val innsendteFiler  = mutableListOf<SoknadFile>()
-		uuids.forEach { innsendteFiler.add(SoknadFile(it, SoknadFile.FileStatus.notfound, null, null)) }
+		uuids.forEach { innsendteFiler.add(fileMockService.getFile(it)) }
 		logger.info(
 			"$xInnsendingId: Status for henting av følgende innsendte filer ${
 				innsendteFiler.map { it.id + ":" + it.fileStatus + ":size=" + it.content?.size }.toList()

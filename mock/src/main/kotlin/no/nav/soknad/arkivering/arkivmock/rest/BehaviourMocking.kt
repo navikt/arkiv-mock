@@ -1,6 +1,8 @@
 package no.nav.soknad.arkivering.arkivmock.rest
 
 import no.nav.soknad.arkivering.arkivmock.service.BehaviourService
+import no.nav.soknad.arkivering.arkivmock.service.FileMockService
+import no.nav.soknad.arkivering.arkivmock.service.FileResponses
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/arkiv-mock/response-behaviour")
-class BehaviourMocking(val behaviourService: BehaviourService) {
+class BehaviourMocking(val behaviourService: BehaviourService, val fileMockService: FileMockService) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
 	@PutMapping("/mock-response/{key}/{statusCode}/{forAttempts}")
@@ -39,6 +41,17 @@ class BehaviourMocking(val behaviourService: BehaviourService) {
 		return ResponseEntity(HttpStatus.OK)
 	}
 
+
+	@PutMapping("/set-delay-behaviour/{key}")
+	fun mockDelayedOkResponseBehaviour(@PathVariable("key") key: String): ResponseEntity<String> {
+		logger.debug("$key: will delay and return http status ${HttpStatus.OK}")
+
+		behaviourService.setDelayBehaviour(key)
+
+		return ResponseEntity(HttpStatus.OK)
+	}
+
+
 	@PutMapping("/set-normal-behaviour/{key}")
 	fun setNormalResponseBehaviour(@PathVariable("key") key: String): ResponseEntity<String> {
 		logger.debug("$key: will accept all calls and return http status ${HttpStatus.OK}")
@@ -47,4 +60,5 @@ class BehaviourMocking(val behaviourService: BehaviourService) {
 
 		return ResponseEntity(HttpStatus.OK)
 	}
+
 }
