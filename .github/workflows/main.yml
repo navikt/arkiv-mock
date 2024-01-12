@@ -25,6 +25,7 @@ jobs:
         run: mvn install --file pom.xml
 
       - name: Build and push Docker image
+        if: ${{ github.actor != 'dependabot[bot]' }}
         uses: nais/docker-build-push@v0
         id: docker-build-push
         with:
@@ -37,6 +38,7 @@ jobs:
 
   deploy-loadtests:
     name: Deploy to loadtests
+    if: ${{ github.actor != 'dependabot[bot]' }}
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
