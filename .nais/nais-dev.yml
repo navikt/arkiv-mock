@@ -11,6 +11,10 @@ metadata:
 spec:
   image: {{image}}
   port: 8092
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
   replicas:
     min: 2
     max: 4
