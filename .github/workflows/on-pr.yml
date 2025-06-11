@@ -33,6 +33,11 @@ jobs:
         with:
           component_name: soknadsarkiverer
 
+      - name: 'Build the code for innsending-api'
+        uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
+        with:
+          component_name: innsending-api
+
       - name: 'Build the code for arkiv-mock (this PR)'
         uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
         with:
