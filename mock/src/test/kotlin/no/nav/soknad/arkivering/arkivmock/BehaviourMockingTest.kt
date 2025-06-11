@@ -9,10 +9,10 @@ import no.nav.soknad.arkivering.arkivmock.exceptions.NotFoundException
 import no.nav.soknad.arkivering.arkivmock.rest.ArkivRestInterface
 import no.nav.soknad.arkivering.arkivmock.rest.BehaviourMocking
 import no.nav.soknad.arkivering.arkivmock.service.kafka.KafkaPublisher
-import org.junit.Ignore
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
@@ -51,7 +51,7 @@ class BehaviourMockingTest {
 	}
 
 	@Test
-	@Ignore // This test takes more than 8 minutes to run.
+	@Disabled("This test takes more than 8 minutes to run.")
 	fun `Delay ok response - Will broadcast on Kafka`() {
 		behaviourMocking.mockDelayedOkResponseBehaviour(id)
 
