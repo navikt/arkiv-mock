@@ -13,13 +13,13 @@ import org.springframework.stereotype.Controller
 class HealthCheck(@Value("\${status_log_url}") private val logUrl: String) : HealthApi {
 
 	@Unprotected
-	override fun isAlive() = ResponseEntity<Unit>(HttpStatus.OK)
+	override fun isAlive() = ResponseEntity<String>(HttpStatus.OK)
 
 	@Unprotected
-	override fun ping() = ResponseEntity<Unit>(HttpStatus.OK)
+	override fun ping() = ResponseEntity<String>(HttpStatus.OK)
 
 	@Unprotected
-	override fun isReady() = ResponseEntity<Unit>(HttpStatus.OK)
+	override fun isReady() = ResponseEntity<String>(HttpStatus.OK)
 
 	@Unprotected
 	override fun getStatus(): ResponseEntity<ApplicationStatus> {
