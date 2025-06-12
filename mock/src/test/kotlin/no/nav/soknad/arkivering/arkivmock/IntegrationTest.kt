@@ -5,6 +5,7 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.soknad.arkivering.arkivmock.dto.ArkivData
 import no.nav.soknad.arkivering.arkivmock.dto.ArchiveEntity
+import no.nav.soknad.arkivering.arkivmock.dto.AvsenderMottaker
 import no.nav.soknad.arkivering.arkivmock.dto.Bruker
 import no.nav.soknad.arkivering.arkivmock.rest.ArkivRestInterface
 import no.nav.soknad.arkivering.arkivmock.rest.BehaviourMocking
@@ -51,7 +52,7 @@ class IntegrationTest {
 
 	private fun createRequestData(id: String) =
 		ArkivData(
-			Bruker("12345678901", "FNR"), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME), emptyList(),
+			AvsenderMottaker("12345678901", "FNR"), Bruker("12345678901", "FNR"), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME), emptyList(),
 			id, "INNGAAENDE", "NAV_NO", tema, title
 		)
 }

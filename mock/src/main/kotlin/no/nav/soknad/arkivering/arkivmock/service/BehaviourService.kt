@@ -50,6 +50,7 @@ class BehaviourService(val objectMapper: ObjectMapper) {
 	}
 
 	fun reactToArchiveRequest(key: String) {
+		logger.info("$key: reactToArchiveRequest")
 		if (!behaviours.containsKey(key)) {
 			logger.warn("$key: has not registered a behaviour for key. Will proceed as normal.")
 			return
@@ -68,6 +69,7 @@ class BehaviourService(val objectMapper: ObjectMapper) {
 	}
 
 	fun alterResponse(key: String, response: OpprettJournalpostResponse): String? {
+		logger.info("$key: Altering response (journalpostId ${response.journalpostId})")
 		val jsonResponse = objectMapper.writeValueAsString(response)
 		val journalpostIdMessage = "Will return normal response with journalpostId '${response.journalpostId}'"
 

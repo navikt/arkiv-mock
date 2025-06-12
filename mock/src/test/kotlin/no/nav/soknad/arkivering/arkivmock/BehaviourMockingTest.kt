@@ -3,6 +3,7 @@ package no.nav.soknad.arkivering.arkivmock
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.verify
 import no.nav.soknad.arkivering.arkivmock.dto.ArkivData
+import no.nav.soknad.arkivering.arkivmock.dto.AvsenderMottaker
 import no.nav.soknad.arkivering.arkivmock.dto.Bruker
 import no.nav.soknad.arkivering.arkivmock.exceptions.InternalServerErrorException
 import no.nav.soknad.arkivering.arkivmock.exceptions.NotFoundException
@@ -129,7 +130,7 @@ class BehaviourMockingTest {
 
 	private fun createRequestData(personId: String) =
 		ArkivData(
-			Bruker(personId, "FNR"), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME), emptyList(),
+			AvsenderMottaker(personId, "FNR"), Bruker(personId, "FNR"), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME), emptyList(),
 			personId, "INNGAAENDE", "NAV_NO", "tema", "tittel"
 		)
 }
