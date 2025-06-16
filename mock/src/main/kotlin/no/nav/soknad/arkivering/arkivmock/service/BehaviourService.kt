@@ -4,11 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.soknad.arkivering.arkivmock.dto.OpprettJournalpostResponse
 import no.nav.soknad.arkivering.arkivmock.exceptions.*
 import no.nav.soknad.arkivering.arkivmock.service.BEHAVIOUR.*
-import no.nav.soknad.innsending.model.SoknadFile
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.io.ByteArrayOutputStream
-import java.time.OffsetDateTime
 
 @Service
 class BehaviourService(val objectMapper: ObjectMapper) {
@@ -68,7 +65,7 @@ class BehaviourService(val objectMapper: ObjectMapper) {
 
 	}
 
-	fun alterResponse(key: String, response: OpprettJournalpostResponse): String? {
+	fun alterResponse(key: String, response: OpprettJournalpostResponse): String {
 		logger.info("$key: Altering response (journalpostId ${response.journalpostId})")
 		val jsonResponse = objectMapper.writeValueAsString(response)
 		val journalpostIdMessage = "Will return normal response with journalpostId '${response.journalpostId}'"

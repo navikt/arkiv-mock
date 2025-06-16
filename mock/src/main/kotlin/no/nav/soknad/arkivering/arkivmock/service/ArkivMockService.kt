@@ -15,7 +15,7 @@ import java.util.*
 class ArkivMockService(private val behaviourService: BehaviourService, private val kafkaPublisher: KafkaPublisher) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
-	fun archive(key: String, arkivData: ArkivData): String? {
+	fun archive(key: String, arkivData: ArkivData): String {
 		logger.info("$key: Will archive data for user ${arkivData.bruker} - ${arkivData.tittel} (tema ${arkivData.tema})")
 		reactToArchiveRequest(key)
 
