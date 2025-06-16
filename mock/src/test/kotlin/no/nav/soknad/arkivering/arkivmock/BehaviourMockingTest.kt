@@ -3,16 +3,17 @@ package no.nav.soknad.arkivering.arkivmock
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.verify
 import no.nav.soknad.arkivering.arkivmock.dto.ArkivData
+import no.nav.soknad.arkivering.arkivmock.dto.AvsenderMottaker
 import no.nav.soknad.arkivering.arkivmock.dto.Bruker
 import no.nav.soknad.arkivering.arkivmock.exceptions.InternalServerErrorException
 import no.nav.soknad.arkivering.arkivmock.exceptions.NotFoundException
 import no.nav.soknad.arkivering.arkivmock.rest.ArkivRestInterface
 import no.nav.soknad.arkivering.arkivmock.rest.BehaviourMocking
 import no.nav.soknad.arkivering.arkivmock.service.kafka.KafkaPublisher
-import org.junit.Ignore
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
@@ -51,7 +52,7 @@ class BehaviourMockingTest {
 	}
 
 	@Test
-	@Ignore // This test takes more than 8 minutes to run.
+	@Disabled("This test takes more than 8 minutes to run.")
 	fun `Delay ok response - Will broadcast on Kafka`() {
 		behaviourMocking.mockDelayedOkResponseBehaviour(id)
 
@@ -129,7 +130,7 @@ class BehaviourMockingTest {
 
 	private fun createRequestData(personId: String) =
 		ArkivData(
-			Bruker(personId, "FNR"), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME), emptyList(),
+			AvsenderMottaker(personId, "FNR"), Bruker(personId, "FNR"), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME), emptyList(),
 			personId, "INNGAAENDE", "NAV_NO", "tema", "tittel"
 		)
 }

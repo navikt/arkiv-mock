@@ -1,5 +1,14 @@
 server:
   port: 8092
+  max-http-request-header-size: 32KB
+  tomcat:
+    max-http-form-post-size: 400MB
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 400MB
+      max-request-size: 400MB
 
 management:
   endpoint:
@@ -9,9 +18,9 @@ management:
     exposure:
       include: info, health, metrics, prometheus
     base-path: "/internal"
-  metrics:
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
 
 status_log_url: "https://logs.adeo.no"

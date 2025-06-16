@@ -1,11 +1,13 @@
 package no.nav.soknad.arkivering.arkivmock.dto
 
-data class Dokumenter(val brevkode: String, val dokumentInfoId: String, val tittel: String)
-
 data class OpprettJournalpostResponse(
 	val dokumenter: List<Dokumenter>,
 	val journalpostId: String,
 	val journalpostferdigstilt: Boolean,
-	val journalstatus: String,
-	val melding: String? = null
-)
+	val journalstatus: String? = null,
+	val melding: String? = null)
+
+data class Dokumenter(
+	val brevkode: String? = null,
+	val dokumentInfoId: String? = null,
+	val tittel: String? = null)

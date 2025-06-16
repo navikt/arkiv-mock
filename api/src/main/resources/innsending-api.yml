@@ -4,40 +4,32 @@ info:
   version: 1.0.1
   title: Innsending-api
   contact:
-    name: team-soknad
-    email: team-soknad@nav.no
+    name: team-fyllut-sendinn
+    url: https://nav-it.slack.com/archives/C04J0SGHQTD
   license:
     name: MIT License
     url: https://github.com/navikt/soknadsfillager/blob/main/LICENSE
 tags:
-  - name: frontend
-    description: Endepunkt for å opprette søknad basert på skjemanummer, støtte opplasting av vedlegg og innsending av søknad.
+  - name: ettersending
+    description: API for fyllut-ettersending applikasjonen.
+  - name: fyllut
+    description: API for fyllut applikasjonen. Endepunkt for å opprette søknad gitt utfylt skjema, slik at søker kan bruke frontend til å legge til vedlegg og sende inn.
   - name: innsendte
-    description: Endepunkt for å hente liste av allerede innsendte søknader.
-  - name: fyllUt
-    description: Endepunkt for å opprette søknad gitt utfylt skjema, slik at søker kan bruke frontend til å legge til vedlegg og sende inn.
+    description: API for soknadsarkiverer. Endepunkt for å hente liste av allerede innsendte søknader.
+  - name: sendinn-soknad
+    description: API for sendinn-frontend applikasjonen for å håndtere søknader.
+  - name: sendinn-vedlegg
+    description: API for sendinn-frontend applikasjonen for å håndtere vedlegg.
+  - name: sendinn-fil
+    description: API for sendinn-frontend applikasjonen for å håndtere filer.
+  - name: soknadsveiviser
+    description: API for soknadsveiviser applikasjonen.
+  - name: ekstern
+    description: API for eksterne applikasjoner.
+  - name: endtoend
+    description: API for endtoend-tester.
 
 paths:
-  /fyllUt/v1/leggTilVedlegg:
-    post:
-      summary: (DEPRECATED) Motta ferdig utfylt søknad og metadata til denne.
-      description: FyllUt tjenesten gir søker mulighet til å fylle ut en søknad. Når vedkommende er ferdig med dette kalles dette endepunktet for å mellomlagre søknaden og gi søker mulighet til å laste opp eventuelle vedlegg og sende inn søknaden og disse til NAV.
-      operationId: fyllUt
-
-      requestBody:
-        description: Søknadsmetadata og søknad som PDF og Json samt liste over eventuelle obligatoriske og valgfrie vedlegg som skal/kan legges til.
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SkjemaDto"
-        required: true
-
-      responses:
-        302:
-          description: Found
-      tags:
-        - soknadFraFyllUt
-
   /fyllUt/v1/soknad/{innsendingsId}:
     get:
       summary: Hent en eksisterende søknadsutfylling
@@ -63,7 +55,7 @@ paths:
         404:
           description: Ingen søknad funnet.
       tags:
-        - fyllUtHentSoknad
+        - fyllut
     put:
       summary: Oppdater en eksisterende søknadsutfylling
       description: Dette endepunktet kalles for hvert steg i FyllUt-flyten og oppdaterer søknaden. Alle felter blir overskrevet unntatt brukerId og skjemanr. Vedleggslisten skal være tom. (Vedleggslisten og hoveddokument (PDF) vil bli lagt til i "PUT /fyllUt/v1/utfyltSoknad/{innsendingsId}").
@@ -95,7 +87,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/SkjemaDto"
       tags:
-        - fyllUtOppdaterSoknad
+        - fyllut
 
     delete:
       summary: Kall for å slette opprettet søknad gitt innsendingsId.
@@ -119,7 +111,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/BodyStatusResponseDto"
       tags:
-        - fyllUtSlettSoknad
+        - fyllut
 
   /fyllUt/v1/utfyltSoknad/{innsendingsId}:
     put:
@@ -135,6 +127,10 @@ paths:
           schema:
             type: string
           style: simple
+        - in: header
+          name: Nav-Env-Qualifier
+          schema:
+            $ref: "#/components/schemas/EnvQualifier"
 
       requestBody:
         description: Søknaddata for å oppdatere søknaden
@@ -148,12 +144,12 @@ paths:
         302:
           description: Oppdatering av ferdig utfylt søknad, med redirect til SendInn
       tags:
-        - fyllUtUtfyltSoknad
+        - fyllut
 
   /fyllUt/v1/soknad:
     post:
       summary: Start en ny søknadsutfylling
-      description: FyllUt tjenesten gir søker mulighet til å fylle ut en søknad. Dette endepunktet kalles når vedkommende starter søknaden og det opprettes en tom søknad i databasen.
+      description: FyllUt tjenesten gir søker mulighet til å fylle ut en søknad. Dette endepunktet kalles når vedkommende starter søknaden og det opprettes en tom søknad i databasen. Hvis bruker allerede har en aktiv søknad på samme skjemanr vil hen få valg om å fortsette på den eller starte en ny.
         En brukernotifikasjon som linker til oppsummeringssiden i FyllUt blir opprettet. For hvert steg i FyllUt kalles PUT endepunktet for å oppdatere søknaden underveis.
       operationId: fyllUtOpprettSoknad
 
@@ -166,7 +162,25 @@ paths:
               $ref: "#/components/schemas/SkjemaDto"
         required: true
 
+      parameters:
+        - name: force
+          in: query
+          description: Hvis bruker allerede har en aktiv søknad på samme skjemanr vil hen få valg om å fortsette på den eller starte en ny.
+            Denne parameteren brukes for å indikere om en bruker ønsker å starte en ny søknad uavhengig av om det allerede er en aktiv søknad på gang.
+          required: false
+          schema:
+            type: boolean
+        - in: header
+          name: Nav-Env-Qualifier
+          schema:
+            $ref: "#/components/schemas/EnvQualifier"
+
       responses:
+        200:
+          description: Returnerer en BodyStatusResponseDto med status og info. Status "soknadAlreadyExists" indikerer at en søknad for dette skjemanummeret allerede er påbegynt. Frontend vil redirecte til side for å velge mellom å fortsette påbegynt søknad eller opprette ny søknad.
+          content:
+            application/json:
+              schema: {} # For at openapi-generator skal generere en type for responsen som støtter både SkjemaDto og BodyStatusResponseDto
         201:
           description: Søknad opprettet
           content:
@@ -174,30 +188,165 @@ paths:
               schema:
                 $ref: "#/components/schemas/SkjemaDto"
       tags:
-        - fyllUtOpprettSoknad
+        - fyllut
 
-
-  /innsendte/v1/hentAktiveSaker:
+  /fyllUt/v1/prefill-data:
     get:
-      summary: Hente liste over allerede innsendte søknader.
-      description: For å hjelpe søker til å finne fram relevant søknad han/hun ønsker å få ettersendt dokumenter på, skal det være mulig å hente ut en liste av innsendte søknader.
-      operationId: aktiveSaker
+      summary: Hent data som skal preutfylles i fyllut
+      description: Data hentes fra eksterne kilder som kan brukes til å preutfylle verdier i fyllut
+      operationId: fyllUtPrefillData
 
-      security: [ ]   # No security
+      parameters:
+        - name: properties
+          in: query
+          description: Liste av hvilke data som skal hentes
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
 
       responses:
         '200':
-          description: Vellykket operasjon. Liste av søkers innsendte søknader returneres.
+          description: Data som kan brukes til å preutfylle verdier i fyllut
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrefillData"
+      tags:
+        - fyllut
+
+  /fyllUt/v1/aktiviteter:
+    get:
+      summary: Hent aktiviteter for bruker
+      description: "Henter aktiviteter fra Arena for bruker. Dokumentasjon: (https://confluence.adeo.no/display/ARENA/Arena+-+Tjeneste+REST+-+Tilleggsstoenad+API)"
+      operationId: fyllUtAktiviteter
+
+      parameters:
+        - name: dagligreise
+          in: query
+          schema:
+            type: boolean
+            default: false
+          allowEmptyValue: true
+
+      responses:
+        '200':
+          description: Liste av aktiviteter for bruker. Målgruppen er den høyeste prioriterte målgruppen som overlapper samme periode.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/AktivSakDto"
-        404:
-          description: Ingen innsendte søknader funnet.
+                  $ref: "./arena-api.yml#/components/schemas/Aktivitet"
       tags:
-        - aktiveSaker
+        - fyllut
+
+  /fyllut/v1/ettersending:
+    post:
+      summary: Kall for å opprette en ettersending
+      operationId: opprettEttersending
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpprettEttersending"
+        required: true
+      parameters:
+        - in: header
+          name: Nav-Env-Qualifier
+          schema:
+            $ref: "#/components/schemas/EnvQualifier"
+
+      responses:
+        201:
+          description: Opprettet ettersending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DokumentSoknadDto"
+      tags:
+        - ettersending
+
+  /fyllut/v1/lospost:
+    post:
+      summary: Opprett en innsending av løspost.
+      operationId: opprettLospost
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpprettLospost"
+        required: true
+      parameters:
+        - in: header
+          name: Nav-Env-Qualifier
+          schema:
+            $ref: "#/components/schemas/EnvQualifier"
+
+      responses:
+        201:
+          description: Opprettet innsending for løspost
+          headers:
+            Location:
+              schema:
+                type: string
+              description: Send-inn URL for løspost-innsending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LospostDto"
+        401:
+          description: Uautorisert
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestErrorResponseDto"
+              example:
+                message: Autentisering feilet
+                timestamp: 2023-12-21T09:31:40.549032434
+                errorCode: errorCode.unauthorized
+        500:
+          description: Feil i backend
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestErrorResponseDto"
+              example:
+                message: Noe gikk galt, prøv igjen senere
+                timestamp: 2023-12-21T09:31:40.549032434
+                errorCode: somethingFailedTryLater
+      tags:
+        - lospost
+
+
+  /fyllUt/v1/merge-filer:
+    post:
+      summary: Merge en liste av PDFer til en PDF
+      description: Gitt en liste av PDFer, returneres en sammenslått PDF.
+      operationId: fyllUtMergeFiler
+
+      requestBody:
+        description: Tittel, språk og liste av filer som skal slås sammen til en PDF
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MergeFilerDto"
+        required: true
+
+      responses:
+        200:
+          description: Sammenslått PDF
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+      tags:
+        - fyllutMerge
+
 
   /innsendte/v1/files/{uuids}:
     get:
@@ -235,7 +384,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/SoknadFile"
       tags:
-        - hentInnsendteFiler
+        - innsendte
 
 
   /frontend/v1/soknad:
@@ -243,6 +392,12 @@ paths:
       summary: Kall for å opprette en søknad basert på skjemanummer og med en eventuell liste av vedlegg.
       description: På basis av oppgitt skjemanummer og eventuelle vedlegg, blir det opprettet en søknad som inviterer søker til å laste ned skjema for utfylling og opplasting av dette og eventuelle vedlegg.
       operationId: opprettSoknad
+
+      parameters:
+        - in: header
+          name: Nav-Env-Qualifier
+          schema:
+            $ref: "#/components/schemas/EnvQualifier"
 
       requestBody:
         description: Data neccessary in order to publish a new task or message user notification.
@@ -260,55 +415,20 @@ paths:
               schema:
                 $ref: "#/components/schemas/DokumentSoknadDto"
       tags:
-        - opprettSoknad
+        - soknadsveiviser
 
-    get:
-      summary: Kall for å hente alle opprettede ikke innsendte søknader.
-      description: Det returneres en liste av alle søknader som søker ikke har sendt inn.
-      operationId: hentAktiveOpprettedeSoknader
-
-      responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                description: Liste av opprettede dokumenter. Returnerer en to liste dersom ingen er funnet.
-                items:
-                  $ref: "#/components/schemas/DokumentSoknadDto"
-      tags:
-        - hentAktiveOpprettedeSoknader
-
-  /frontend/v1/ettersendingPaInnsendingsId:
-    post:
-      summary: Kall for å opprette en ettersendingssøknad basert på innsendingsid til søknaden det skal ettersendes på.
-      description: På basis av oppgitt innsendingsid, blir det opprettet en ettersendingssøknad som inviterer søker til å laste opp vedlegg.
-      operationId: ettersendingPaInnsendingsId
-
-      requestBody:
-        description: Data neccessary in order to publish a new task or message user notification.
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/OpprettEttersendingGittInnsendingsId"
-        required: true
-
-      responses:
-        201:
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DokumentSoknadDto"
-      tags:
-        - ettersendingPaInnsendingsId
 
   /frontend/v1/ettersendPaSkjema:
     post:
       summary: Kall for å opprette en ettersendingssøknad basert på et skjemanummer.
       description: På basis av oppgitt skjemanummer, blir det opprettet en ettersendingssøknad som inviterer søker til å laste opp vedlegg.
       operationId: opprettEttersendingGittSkjemanr
+
+      parameters:
+        - in: header
+          name: Nav-Env-Qualifier
+          schema:
+            $ref: "#/components/schemas/EnvQualifier"
 
       requestBody:
         description: Data neccessary in order to publish a new task or message user notification.
@@ -326,7 +446,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/DokumentSoknadDto"
       tags:
-        - opprettEttersendingGittSkjemanr
+        - soknadsveiviser
+
 
   /frontend/v1/soknad/{innsendingsId}:
     get:
@@ -351,7 +472,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/DokumentSoknadDto"
       tags:
-        - hentSoknad
+        - sendinn-soknad
 
     patch:
       summary: Kall for å endre visningsSteg på søknad gitt innsendingsId.
@@ -379,7 +500,7 @@ paths:
         204:
           description: No content
       tags:
-        - endreSoknad
+        - sendinn-soknad
 
     delete:
       summary: Kall for å slette opprettet søknad gitt innsendingsId.
@@ -403,7 +524,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/BodyStatusResponseDto"
       tags:
-        - slettSoknad
+        - sendinn-soknad
 
   /frontend/v1/soknad/{innsendingsId}/vedlegg:
     post:
@@ -437,7 +558,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/VedleggDto"
       tags:
-        - lagreVedlegg
+        - sendinn-vedlegg
 
     get:
       summary: Kall for å hente vedlegg (inkludert hoveddokument) til søknad gitt innsendingsId.
@@ -463,7 +584,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/VedleggDto"
       tags:
-        - hentVedleggsListe
+        - sendinn-vedlegg
 
   /frontend/v1/soknad/{innsendingsId}/vedlegg/{vedleggsId}:
     get:
@@ -496,7 +617,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/VedleggDto"
       tags:
-        - hentVedlegg
+        - sendinn-vedlegg
 
     patch:
       summary: Kall for å endre tittel og status på et vedlegg.
@@ -537,7 +658,7 @@ paths:
                 $ref: "#/components/schemas/VedleggDto"
 
       tags:
-        - endreVedlegg
+        - sendinn-vedlegg
 
     delete:
       summary: Kall for å slette ett spesifikt vedlegg med dens filer til søknad gitt innsendingsId.
@@ -569,7 +690,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/BodyStatusResponseDto"
       tags:
-        - slettVedlegg
+        - sendinn-vedlegg
 
   /frontend/v1/soknad/{innsendingsId}/vedlegg/{vedleggsId}/fil:
     post:
@@ -614,7 +735,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/FilDto"
       tags:
-        - lagreFil
+        - sendinn-fil
 
     get:
       summary: Kall for å hente en opplastede filer på ett vedlegg til en søknad gitt innsendingsId, vedleggsId og filId.
@@ -648,7 +769,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/FilDto"
       tags:
-        - hentFilInfoForVedlegg
+        - sendinn-fil
 
 
   /frontend/v1/soknad/{innsendingsId}/vedlegg/{vedleggsId}/fil/{filId}:
@@ -691,7 +812,7 @@ paths:
                 type: string
                 format: binary
       tags:
-        - hentFil
+        - sendinn-fil
 
     delete:
       summary: Kall for å slette en opplastet fil på en søknad gitt innsendingsId, vedleggsId og filId.
@@ -731,7 +852,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/VedleggDto"
       tags:
-        - slettFil
+        - sendinn-fil
 
   /frontend/v1/sendInn/{innsendingsId}:
     post:
@@ -747,6 +868,10 @@ paths:
           schema:
             type: string
           style: simple
+        - in: header
+          name: Nav-Env-Qualifier
+          schema:
+            $ref: "#/components/schemas/EnvQualifier"
 
       responses:
         200:
@@ -756,8 +881,363 @@ paths:
               schema:
                 $ref: "#/components/schemas/KvitteringsDto"
       tags:
-        - sendInnSoknad
+        - sendinn-soknad
 
+  /frontend/v1/skjema/{skjemanr}/soknader:
+    get:
+      summary: Kall for å hente opprettede søknader for bruker gitt skjemanummer
+      description: Kan filtrere på 'soknad' | 'ettersendelse'
+      operationId: hentSoknaderForSkjemanr
+
+      parameters:
+        - name: skjemanr
+          in: path
+          description: Skjemaet som søknaden er basert på
+          required: true
+          schema:
+            type: string
+          style: simple
+        - name: soknadstyper
+          in: query
+          description: "Komma-separert liste som filtrerer hvilke type søknader som skal returnes. Feks: 'soknad,ettersendelse'"
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/SoknadType"
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DokumentSoknadDto"
+      tags:
+        - fyllut
+
+  /ekstern/v1/ettersending:
+    post:
+      summary: Kall for å opprette en ettersending fra eksterne applikasjoner. Skjemanr, tema og vedleggskoder valideres mot kodeverket (se https://kodeverk-web.dev.intern.nav.no/).
+        Skjemanr og vedleggskoder er valgfrie og vil bli hentet fra kodeverket hvis de ikke er oppgitt. Merk at kodeverket ikke alltid har oversettelser for alle språk og vil bruke norsk som fallback.
+      operationId: eksternOpprettEttersending
+      parameters:
+        - name: Nav-Call-Id
+          in: header
+          description: En ID som identifiserer kallkjeden som dette kallet er en del av
+          required: false
+          schema:
+            type: string
+        - in: header
+          name: Nav-Env-Qualifier
+          schema:
+            $ref: "#/components/schemas/EnvQualifier"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EksternOpprettEttersending"
+        required: true
+
+      responses:
+        201:
+          description: Opprettet ettersending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DokumentSoknadDto"
+        401:
+          description: Uautorisert
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestErrorResponseDto"
+              example:
+                message: Autentisering feilet
+                timestamp: 2023-12-21T09:31:40.549032434
+                errorCode: errorCode.unauthorized
+        500:
+          description: Feil i backend
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestErrorResponseDto"
+              example:
+                message: Noe gikk galt, prøv igjen senere
+                timestamp: 2023-12-21T09:31:40.549032434
+                errorCode: somethingFailedTryLater
+      tags:
+        - ekstern
+
+
+  /ekstern/v1/ettersending/{innsendingsId}:
+    delete:
+      summary: Kall for å slette opprettet ettersending gitt innsendingsId.
+      description: Dersom funnet, slettes søknaden.
+      operationId: eksternSlettEttersending
+
+      parameters:
+        - name: innsendingsId
+          in: path
+          description: identifisering av søknad
+          required: true
+          schema:
+            type: string
+          style: simple
+        - name: Nav-Call-Id
+          in: header
+          description: En ID som identifiserer kallkjeden som dette kallet er en del av.
+          required: false
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Slettet ettersending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BodyStatusResponseDto"
+        401:
+          description: Uautorisert
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestErrorResponseDto"
+              example:
+                message: Autentisering feilet
+                timestamp: 2023-12-21T09:31:40.549032434
+                errorCode: errorCode.unauthorized
+        404:
+          description: Ingen ettersending funnet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestErrorResponseDto"
+              example:
+                message: Ingen ettersending funnet
+                timestamp: 2023-12-21T09:31:40.549032434
+                errorCode: errorCode.resourceNotFound
+        500:
+          description: Feil i backend
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestErrorResponseDto"
+              example:
+                message: Noe gikk galt, prøv igjen senere
+                timestamp: 2023-12-21T09:31:40.549032434
+                errorCode: somethingFailedTryLater
+      tags:
+        - ekstern
+
+  /ekstern/v1/skjema/{skjemanr}/soknader:
+    get:
+      summary: Kall for å hente opprettede søknader for bruker gitt skjemanummer fra eksterne applikasjoner
+      description: Kan filtrere på 'soknad' | 'ettersendelse'
+      operationId: eksternHentSoknaderForSkjemanr
+
+      parameters:
+        - name: skjemanr
+          in: path
+          description: Skjemaet som søknaden er basert på
+          required: true
+          schema:
+            type: string
+          style: simple
+          example: "NAV 55-00.60"
+        - name: soknadstyper
+          in: query
+          description: "Komma-separert liste som filtrerer hvilke type søknader som skal returnes. Feks: 'soknad,ettersendelse'"
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/SoknadType"
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DokumentSoknadDto"
+      tags:
+        - ekstern
+
+
+  /ekstern/v1/oppgaver:
+    post:
+      summary: Kall fra saksbehandler for å opprette en oppgave til en søker for ettersending av dokumentasjon. Skjemanr, tema og vedleggskoder valideres mot kodeverket (se https://kodeverk-web.dev.intern.nav.no/).
+        Skjemanr og vedleggskoder er valgfrie og vil bli hentet fra kodeverket hvis de ikke er oppgitt. Merk at kodeverket ikke alltid har oversettelser for alle språk og vil bruke norsk som fallback.
+      operationId: EksternEttersendingsOppgave
+      parameters:
+        - name: Nav-Call-Id
+          in: header
+          description: En ID som identifiserer kallkjeden som dette kallet er en del av
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EksternEttersendingsOppgave"
+        required: true
+
+      responses:
+        201:
+          description: Opprettet ettersendings oppgave
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DokumentSoknadDto"
+        401:
+          description: Uautorisert
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestErrorResponseDto"
+              example:
+                message: Autentisering feilet
+                timestamp: 2023-12-21T09:31:40.549032434
+                errorCode: errorCode.unauthorized
+        500:
+          description: Feil i backend
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestErrorResponseDto"
+              example:
+                message: Noe gikk galt, prøv igjen senere
+                timestamp: 2023-12-21T09:31:40.549032434
+                errorCode: somethingFailedTryLater
+      tags:
+        - eksternoppgave
+
+    get:
+      summary: Kall for å hente opprettede søknader/ettersendinger for bruker gitt skjemanummer fra eksterne applikasjoner
+      description: Kan filtrere på 'soknad' | 'ettersendelse'
+      operationId: oppgaveHentSoknaderForSkjemanr
+
+      parameters:
+        - name: Nav-Call-Id
+          in: header
+          description: En ID som identifiserer kallkjeden som dette kallet er en del av.
+          required: false
+          schema:
+            type: string
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BrukerSoknadRequest"
+        required: true
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DokumentSoknadDto"
+      tags:
+        - eksternoppgave
+
+
+  /ekstern/v1/oppgaver/{innsendingsId}:
+    delete:
+      summary: Kall for å slette opprettet søknad eller ettersending gitt innsendingsId.
+      description: Dersom funnet, slettes søknaden/ettersendingen dersom den slettes av samme applikasjon som har opprettet den.
+      operationId: eksternOppgaveSlett
+
+      parameters:
+        - name: innsendingsId
+          in: path
+          description: identifisering av søknad/ettersending
+          required: true
+          schema:
+            type: string
+          style: simple
+        - name: Nav-Call-Id
+          in: header
+          description: En ID som identifiserer kallkjeden som dette kallet er en del av.
+          required: false
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Slettet søknad/ettersending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BodyStatusResponseDto"
+        401:
+          description: Uautorisert
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestErrorResponseDto"
+              example:
+                message: Autentisering feilet
+                timestamp: 2023-12-21T09:31:40.549032434
+                errorCode: errorCode.unauthorized
+        404:
+          description: Ingen ettersending funnet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestErrorResponseDto"
+              example:
+                message: Ingen ettersending funnet
+                timestamp: 2023-12-21T09:31:40.549032434
+                errorCode: errorCode.resourceNotFound
+        500:
+          description: Feil i backend
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestErrorResponseDto"
+              example:
+                message: Noe gikk galt, prøv igjen senere
+                timestamp: 2023-12-21T09:31:40.549032434
+                errorCode: somethingFailedTryLater
+      tags:
+        - eksternoppgave
+
+
+  /endtoend/v1/soknad/{innsendingsId}/arkiveringsstatus:
+    get:
+      summary: Henter arkiveringsstatus for en søknad
+      description: Returnerer arkiveringsstatus
+      operationId: getArkiveringsstatus
+
+      parameters:
+        - name: innsendingsId
+          in: path
+          description: Identifisering av søknad som skal hentes
+          required: true
+          schema:
+            type: string
+          style: simple
+
+      responses:
+        200:
+          description: Returnerer arkiveringsstatus
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArkiveringsStatusDto"
+        404:
+          description: Søknad ikke funnet
+      tags:
+        - endtoend
 
   /health/ping:
     get:
@@ -769,6 +1249,10 @@ paths:
       responses:
         '200':
           description: Successful operation; application is responding
+          content:
+            text/plain:
+              schema:
+                type: string
 
       tags:
         - health
@@ -783,6 +1267,10 @@ paths:
       responses:
         '200':
           description: Successful operation; application is alive
+          content:
+            text/plain:
+              schema:
+                type: string
         '500':
           description: The application or one of its dependencies are not up and running.
       tags:
@@ -798,6 +1286,10 @@ paths:
       responses:
         '200':
           description: Successful operation; application is ready
+          content:
+            text/plain:
+              schema:
+                type: string
 
         '503':
           description: The application or one of its dependencies are not ready
@@ -806,8 +1298,8 @@ paths:
 
   /health/status:
     get:
-      summary: Returns detailed status of the application's backend dependencies
-      description: Checks the application's backend dependencies and returns a summary of connection status
+      summary: Returns status of the application
+      description: Returns status of the application
       operationId: getStatus
 
       security: [ ]   # No security
@@ -818,13 +1310,93 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApplicationStatus"
+      tags:
+        - health
 
+  /health/backends:
+    get:
+      summary: Returns status of the application's backend dependencies
+      description: Checks the application's backend dependencies and returns the most critical status
+      operationId: getBackends
+
+      security: [ ]   # No security
+      responses:
+        '200':
+          description: Successful operation; application is responding
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationStatus"
       tags:
         - health
 
 
 components:
   schemas:
+    Adresser:
+      type: object
+      description: Søkerens adresse
+      properties:
+        bostedsadresse:
+          description: Bostedsadresse - Adressen hvor en person er registrert som bosatt i henhold til landets lovverk. Kan kun være en adresse til enhver tid, enten i Norge eller utlandet.
+          $ref: "#/components/schemas/Adresse"
+        oppholdsadresser:
+          type: array
+          description: Liste av oppholdsadresser - Adresse hvor en person oppholder seg, men hvor det ikke er bekreftet at personen er bosatt. Kan være både norsk og utlandsk adresse.
+          items:
+            $ref: "#/components/schemas/Adresse"
+        kontaktadresser:
+          type: array
+          description: Liste av kontaktadresser - Adresse som kan benyttes for å kontakte personen per post. Det er ikke bekreftet om personen er bosatt eller oppholder seg der. Det er ikke krav til dokumentasjon for å registrere denne type adresse i PDL.
+          items:
+            $ref: "#/components/schemas/Adresse"
+
+    Adresse:
+      type: object
+      description: Adresse
+      properties:
+        gyldigFraOgMed:
+          type: string
+          format: date
+          description: Gyldig fra og med dato
+          example: "2020-01-01"
+        gyldigTilOgMed:
+          type: string
+          format: date
+          description: Gyldig fra og med dato
+          example: "2030-01-01"
+        co:
+          type: string
+          description: C/O-adresse
+          example: "c/o Ola Nordmann"
+        adresse:
+          type: string
+          description: Gatenavn og husnummer o.l.
+          example: "Klostergata 57A"
+        bygning:
+          type: string
+          description: Informasjon som navn på bygg, etasje i et bygg, leilighetsnummer o.l. (utenlandske adresser har dette feltet i PDL)
+        postboks:
+          type: string
+          description: Postboksnummer og postboksanlegg
+          example: "P.O.Box 1234 Place"
+        postnummer:
+          type: string
+          description: Postnummer
+          example: "SE-12345"
+        bySted:
+          type: string
+          description: Inneholder poststed for norske adresser, ellers by/bydel/bysted (utenlandske adresser har dette feltet i PDL)
+          example: "Roma"
+        region:
+          type: string
+          description: Navn på et område innenfor et land, kan være landsby, stat eller noe i mellom (utenlandske adresser har dette feltet i PDL)
+          example: "Yorkshire"
+        landkode:
+          type: string
+          description: Alpha-3 landekode
+          example: "SWE"
+
     AktivSakDto:
       type: object
       description: Data om en allerede innsendt søknad
@@ -856,7 +1428,7 @@ components:
 
     ApplicationStatus:
       type: object
-      description: Operativ status på applikasjonen
+      description: Applikasjonsnavn og liste med konnektivitets status mot applikasjonens backend avhengigheter.
       required:
         - status
 
@@ -878,6 +1450,11 @@ components:
       x-enum-varnames: [ "OK", "ISSUE", "DOWN" ]
       description: Operativ status på applikasjonen. (OK=Tjeneste er tilgjengelig og fungerer normalt, ISSUE=Tjeneste er tilgjengelig, men med begrenset funksjonalitet/kapasitet, DOWN=Tjeneste er utilgjengelig)
       example: OK
+
+    Applikasjon:
+      type: string
+      description: Applikasjon som har opprettet søknaden
+      example: "fyllut"
 
     ArkiveringsStatusDto:
       type: string
@@ -909,26 +1486,26 @@ components:
       description: Ident til søker som har opprettet søknad i fyllUt tjenesten.
       example: 12128012345
 
-    DependencyStatus:
+    BrukernotifikasjonsType:
+      type: string
+      enum: [utkast, oppgave]
+      example: oppgave
+
+    BrukerSoknadRequest:
       type: object
-      description: Informasjon om connection status og konsekvens ved feil til baksystem som applikasjonen bruker
+      description: Data for å hente aktive søknader på et skjemanr for en bruker
       required:
-        - name
-        - status
-        - severity
+        - brukerId
+        - skjemanr
       properties:
-        name:
-          type: string
-          description: Navn til avhengigheten
-          example: Soknadsmottaker eller Database
-        status:
-          type: string
-          description: Status på forbindelsen til avhengigheten
-          example: Ok eller Error
-        severity:
-          type: string
-          description: Beskrivelse av konsekvensen dersom statusen er Error
-          example: Critical - Send in of applications will fail
+        brukerId:
+          $ref: "#/components/schemas/BrukerId"
+        skjemanr:
+          $ref: "#/components/schemas/Skjemanr"
+        soknadstyper:
+          type: array
+          items:
+            $ref: "#/components/schemas/SoknadType"
 
     Document:
       type: string
@@ -936,6 +1513,52 @@ components:
       nullable: true
       description: Dokument innhold som en Byte array
       example: Byte array med fil innhold
+
+    LospostDto:
+      type: object
+      description: Data om en opprettet innsending av løspost.
+      required:
+        - brukerId
+        - tittel
+        - tema
+        - status
+        - opprettetDato
+
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identifikasjon av mellomlagret søknad
+          example: 123456
+        innsendingsId:
+          $ref: "#/components/schemas/InnsendingsId"
+        brukerId:
+          $ref: "#/components/schemas/BrukerId"
+        tittel:
+          $ref: "#/components/schemas/Tittel"
+        tema:
+          $ref: "#/components/schemas/Tema"
+        spraak:
+          $ref: "#/components/schemas/Spraak"
+        endretDato:
+          $ref: "#/components/schemas/EndretDato"
+        opprettetDato:
+          type: string
+          format: date-time
+          description: Opprettet dato og tid som UTC
+          example: 2021-12-03T14:10:00Z
+        innsendtDato:
+          type: string
+          format: date-time
+          description: Opprettet dato og tid som UTC
+          example: 2021-12-03T14:10:00Z
+        vedleggsListe:
+          type: array
+          description: Liste av dokumenter (hoveddokument og vedlegg) til søknad
+          items:
+            $ref: "#/components/schemas/VedleggDto"
+        arkiveringsStatus:
+          $ref: "#/components/schemas/ArkiveringsStatusDto"
 
     DokumentSoknadDto:
       type: object
@@ -971,12 +1594,9 @@ components:
           $ref: "#/components/schemas/Spraak"
         status:
           $ref: "#/components/schemas/SoknadsStatusDto"
-        opprettetDato:
-          type: string
-          format: date-time
-          description: Opprettet dato og tid som UTC
-          example: 2021-12-03T14:10:00Z
         endretDato:
+          $ref: "#/components/schemas/EndretDato"
+        opprettetDato:
           type: string
           format: date-time
           description: Opprettet dato og tid som UTC
@@ -1019,6 +1639,117 @@ components:
             Når systemet ser at det mangler påkrevde vedlegg som skal ettersendes, lages det en *oppgave* i stedet.
           example: true
           default: false
+        soknadstype:
+          $ref: "#/components/schemas/SoknadType"
+        skjemaPath:
+          $ref: "#/components/schemas/SkjemaPath"
+        applikasjon:
+          $ref: "#/components/schemas/Applikasjon"
+        skalSlettesDato:
+          $ref: "#/components/schemas/SkalSlettesDato"
+        mellomlagringDager:
+          $ref: "#/components/schemas/MellomlagringDager"
+        erNavOpprettet:
+          type: boolean
+          description: >
+            Markerer om oppretting av denne søknaden er blitt gjort fra en av Navs saksbehandler applikasjoner.
+          example: true
+          default: false
+
+
+    EksternEttersendingsOppgave:
+      type: object
+      description: Data for å opprette en oppgave for ettersending av dokumentasjon
+      required:
+        - brukerId
+        - skjemanr
+        - sprak
+        - tema
+        - vedleggsListe
+      properties:
+        brukerId:
+          $ref:  "#/components/schemas/BrukerId"
+        tittel:
+          $ref: "#/components/schemas/Tittel"
+        skjemanr:
+          $ref: "#/components/schemas/Skjemanr"
+        sprak:
+          $ref: "#/components/schemas/Spraak"
+        tema:
+          $ref: "#/components/schemas/Tema"
+        brukernotifikasjonstype:
+          $ref: "#/components/schemas/BrukernotifikasjonsType"
+        koblesTilEksisterendeSoknad:
+          type: boolean
+          description: "Angir om ettersendingen skal kobles til en eksisterende søknad. Hvis denne er satt til true vil filer som tidligere er lastet opp vises i send-inn. Default: false"
+          example: false
+        vedleggsListe:
+          type: array
+          description: Liste av vedlegg som kan lastes opp
+          items:
+            $ref: "#/components/schemas/InnsendtVedleggDto"
+          example:
+            - vedleggsnr: W1
+              tittel: "Dokumentasjon på mottatt bidrag"
+        innsendingsFristDager:
+          $ref: "#/components/schemas/FristForEttersendelse"
+        mellomlagringDager:
+          $ref: "#/components/schemas/MellomlagringDager"
+
+
+    EksternOpprettEttersending:
+      type: object
+      description: Data for å opprette en ettersending
+      required:
+        - skjemanr
+        - sprak
+        - tema
+        - vedleggsListe
+      properties:
+        tittel:
+          $ref: "#/components/schemas/Tittel"
+        skjemanr:
+          $ref: "#/components/schemas/Skjemanr"
+        sprak:
+          $ref: "#/components/schemas/Spraak"
+        tema:
+          $ref: "#/components/schemas/Tema"
+        brukernotifikasjonstype:
+          $ref: "#/components/schemas/BrukernotifikasjonsType"
+        koblesTilEksisterendeSoknad:
+          type: boolean
+          description: "Angir om ettersendingen skal kobles til en eksisterende søknad. Hvis denne er satt til true vil filer som tidligere er lastet opp vises i send-inn. Default: false"
+          example: false
+        vedleggsListe:
+          type: array
+          description: Liste av vedlegg som kan lastes opp
+          items:
+            $ref: "#/components/schemas/InnsendtVedleggDto"
+          example:
+            - vedleggsnr: W1
+              tittel: "Dokumentasjon på mottatt bidrag"
+        innsendingsfristDager:
+          $ref: "#/components/schemas/FristForEttersendelse"
+        mellomlagringDager:
+          $ref: "#/components/schemas/MellomlagringDager"
+
+    OpprettLospost:
+      type: object
+      description: Data for å opprette en løspost
+      required:
+        - soknadTittel
+        - tema
+        - dokumentTittel
+        - sprak
+      properties:
+        soknadTittel:
+          $ref: "#/components/schemas/Tittel"
+        tema:
+          $ref: "#/components/schemas/Tema"
+        dokumentTittel:
+          $ref: "#/components/schemas/Tittel"
+        sprak:
+          $ref: "#/components/schemas/Spraak"
 
     FilDto:
       type: object
@@ -1048,6 +1779,10 @@ components:
           type: integer
           description: Størrelsen på filen
           example: 12345678
+        antallsider:
+          type: integer
+          description: Antall sider. Dette er aktuelt for PDF filerer
+          example: 10
         data:
           $ref: "#/components/schemas/Document"
         opprettetdato:
@@ -1055,6 +1790,12 @@ components:
           format: date-time
           description: Opprettet tidspunkt i UTC format
           example: 2022-04-01T15:10:00Z
+
+    EndretDato:
+      type: string
+      format: date-time
+      description: Endret dato og tid som UTC
+      example: 2021-12-03T14:10:00Z
 
     Ettersending:
       type: boolean
@@ -1088,12 +1829,17 @@ components:
       description: Data om et dokument på en søknad.
       required:
         - vedleggsnr
-        - tittel
       properties:
         vedleggsnr:
           $ref: "#/components/schemas/Vedleggsnr"
         tittel:
           $ref: "#/components/schemas/Tittel"
+        url:
+          $ref: "#/components/schemas/Vedleggsurl"
+        opplastingsValgKommentarLedetekst:
+          $ref: "#/components/schemas/OpplastingsvalgKommentarLedetekst"
+        opplastingsValgKommentar:
+          $ref: "#/components/schemas/OpplastingsvalgKommentar"
 
     KanLasteOppAnnet:
       type: boolean
@@ -1131,6 +1877,23 @@ components:
           description: Liste av obligatoriske av ingen, en eller flere vedlegg som søker har sagt skal bli sendt inn av andre.
           items:
             $ref: "#/components/schemas/InnsendtVedleggDto"
+        levertTidligere:
+          type: array
+          description: Liste av obligatoriske av ingen, en eller flere vedlegg som er sendt inn tidligere, enten i sammenheng med denne søknadens innsendinger eller som søker har sagt skal har blitt sendt tidligere.
+          items:
+            $ref: "#/components/schemas/InnsendtVedleggDto"
+        sendesIkkeInn:
+          type: array
+          description: Liste av obligatoriske av ingen, en eller flere vedlegg som søker har sagt ikke vil bli sendt inn enten fordi allerede innsendt eller mangler dokumentasjon.
+          items:
+            $ref: "#/components/schemas/InnsendtVedleggDto"
+
+        navKanInnhente:
+          type: array
+          description: Liste av obligatoriske av ingen, en eller flere vedlegg som søker har gitt NAV tillatelse til å innehente.
+          items:
+            $ref: "#/components/schemas/InnsendtVedleggDto"
+
         mottattdato:
           type: string
           format: date-time
@@ -1147,25 +1910,77 @@ components:
       description: Visnings navn for et vedlegg.
       example: Inntektsopplysninger for selvstendig næringsdrivende og frilansere som skal ha foreldrepenger eller svangerskapspenger.
 
+    MellomlagringDager:
+      type: integer
+      description: Antall dager søknaden skal mellomlagres før den automatisk slettes
+      example: 28
+
+    MergeFilerDto:
+      type: object
+      description: Data for merging av filer
+      required:
+        - tittel
+        - filer
+      properties:
+        tittel:
+          $ref: "#/components/schemas/Tittel"
+        sprak:
+          $ref: "#/components/schemas/Spraak"
+        filer:
+          type: array
+          description: Liste av filer som skal merges. Filene merges i samme rekkefølge som de ligger i listen.
+          items:
+            $ref: "#/components/schemas/Document"
+
+
     Mimetype:
       type: string
-      enum: [ "application/pdf", "application/json", "image/png", "image/jpeg" ]
+      enum: [ "application/pdf", "application/json", "image/png", "image/jpeg", "application/xml" ]
       description: Angivelse av formatet på opplastet vedlegg.
       example: application/pdf or image/jpeg.
 
     OpplastingsStatusDto:
       type: string
-      enum: [ "IkkeValgt", "LastetOpp", "Innsendt", "SendSenere", "SendesAvAndre", "SendesIkke" ]
+      enum: [ "IkkeValgt", "LastetOpp", "Innsendt", "SendSenere", "SendesAvAndre", "SendesIkke", "LastetOppIkkeRelevantLenger", "LevertDokumentasjonTidligere", "HarIkkeDokumentasjonen", "NavKanHenteDokumentasjon" ]
       description: Status på om et vedlegg til søknad er enda ikke er lastet opp, lastet opp eller innsendt
 
-    OpprettEttersendingGittInnsendingsId:
+    OpplastingsvalgKommentar:
+      type: string
+      default: null
+      description: Søkers begrunnelse for opplastingsvalg.
+      example: Dokumentasjonen sendes av min fastlege.
+
+    OpplastingsvalgKommentarLedetekst:
+      type: string
+      default: null
+      description: Ledetekst som indikerer hva det er ønsket at søker skal kommentere (på bokmål).
+      example: Hvem skal sende inn denne dokumentasjonen.
+
+    OpprettEttersending:
       type: object
-      description: Data for å angi hvilken søknad søker ønsker å ettersende på
+      description: Data for å opprette en ettersending
       required:
-        - ettersendingTilinnsendingsId
+        - skjemanr
+        - sprak
+        - tema
       properties:
-        ettersendingTilinnsendingsId:
-          $ref: "#/components/schemas/InnsendingsId"
+        tittel:
+          $ref: "#/components/schemas/Tittel"
+        skjemanr:
+          $ref: "#/components/schemas/Skjemanr"
+        sprak:
+          $ref: "#/components/schemas/Spraak"
+        tema:
+          $ref: "#/components/schemas/Tema"
+        vedleggsListe:
+          type: array
+          description: Liste av vedlegg som kan lastes opp
+          items:
+            $ref: "#/components/schemas/InnsendtVedleggDto"
+        innsendingsfristDager:
+          $ref: "#/components/schemas/FristForEttersendelse"
+        mellomlagringDager:
+          $ref: "#/components/schemas/MellomlagringDager"
 
     OpprettEttersendingGittSkjemaNr:
       type: object
@@ -1227,6 +2042,10 @@ components:
           $ref: "#/components/schemas/Tittel"
         opplastingsStatus:
           $ref: "#/components/schemas/OpplastingsStatusDto"
+        opplastingsValgKommentarLedetekst:
+          $ref: "#/components/schemas/OpplastingsvalgKommentarLedetekst"
+        opplastingsValgKommentar:
+          $ref: "#/components/schemas/OpplastingsvalgKommentar"
 
     PostVedleggDto:
       type: object
@@ -1236,10 +2055,61 @@ components:
         tittel:
           $ref: "#/components/schemas/Tittel"
 
+    PrefillData:
+      type: object
+      properties:
+        sokerIdentifikasjonsnummer:
+          type: string
+          nullable: true
+          description: Søkerens fnr eller dnr
+        sokerFornavn:
+          type: string
+          nullable: true
+          description: Søkerens fornavn
+          example: Ola
+        sokerEtternavn:
+          type: string
+          nullable: true
+          description: Søkerens etternavn
+          example: Nordmann
+        sokerAdresser:
+          $ref: "#/components/schemas/Adresser"
+        sokerKjonn:
+          type: string
+          description: Søkerens kjønn
+          example: MANN
+        sokerTelefonnummer:
+          $ref: "#/components/schemas/Telefonnummer"
+        sokerKontonummer:
+          type: string
+          nullable: true
+          description: Søkerens kontonummer
+          example: 8361347234732292
+        sokerMaalgruppe:
+          $ref: "./arena-api.yml#/components/schemas/Maalgruppe"
+
     PropertyNavn:
       type: string
       description: Nøkkelnavn på property. Brukt på vedlegg av type Annet (skjemanr=N6), for å sjekke om dette er default Annet vedlegg eller ikke
       example: annenDokumentasjon,  tilleggsVedleggForSkjemaXX.
+
+    RestErrorResponseDto:
+      type: object
+      description: Feilrespons
+      properties:
+        message:
+          type: string
+          description: Feilmelding
+        timestamp:
+          type: string
+          format: date-time
+        errorCode:
+          type: string
+          description: Feilkode
+      example:
+        message: Noe gikk galt, prøv igjen senere
+        timestamp: 2023-12-21T09:31:40.549032434
+        errorCode: somethingFailedTryLater
 
     SkjemaDokumentDto:
       type: object
@@ -1267,6 +2137,8 @@ components:
           $ref: "#/components/schemas/PropertyNavn"
         formioId:
           $ref: "#/components/schemas/FormioId"
+        vedleggsurl:
+          $ref: "#/components/schemas/Vedleggsurl"
 
     SkjemaDto:
       type: object
@@ -1308,11 +2180,32 @@ components:
           $ref: "#/components/schemas/KanLasteOppAnnet"
         fristForEttersendelse:
           $ref: "#/components/schemas/FristForEttersendelse"
+        endretDato:
+          $ref: "#/components/schemas/EndretDato"
+        skalSlettesDato:
+          $ref: "#/components/schemas/SkalSlettesDato"
+        mellomlagringDager:
+          $ref: "#/components/schemas/MellomlagringDager"
+        skjemaPath:
+          $ref: "#/components/schemas/SkjemaPath"
+        visningsType:
+          $ref: "#/components/schemas/VisningsType"
 
     Skjemanr:
       type: string
       description: NAV skjemanummeret for identifisering av søknaden som er opprettet.
       example: NAV 08-21.05
+
+    SkjemaPath:
+      type: string
+      description: Skjemanr som brukes i url path (små bokstaver uten mellomrom eller spesialtegn)
+      example: nav100708
+
+    SkalSlettesDato:
+      type: string
+      format: date-time
+      description: Dato søknaden vil slettes. En skedulert slettejobb kjøres hver kveld.
+      example: 2021-12-03T00:00:00Z
 
     SoknadsStatusDto:
       type: string
@@ -1348,10 +2241,21 @@ components:
           description: current state of the file. Can be `deleted`, `notfound`, `ok`
           example: not-found
 
+    SoknadType:
+      type: string
+      enum: [ "soknad", "ettersendelse" ]
+      description: Hvilke type søknader som er tilgjengelig for henting
+      example: ettersendelse
+
     Spraak:
       type: string
       description: Søkers foretrukne språk. Det er alltid støtte for nb_NO (norsk bokmål). Det er varierende støtte for andre språk på ulike skjema.
       example: nb_NO
+
+    Telefonnummer:
+      type: string
+      description: Telefonnummer
+      example: "+4712345678"
 
     Tema:
       type: string
@@ -1432,11 +2336,20 @@ components:
           example: 2021-12-03T14:10:00Z
         formioId:
           $ref: "#/components/schemas/FormioId"
+        opplastingsValgKommentarLedetekst:
+          $ref: "#/components/schemas/OpplastingsvalgKommentarLedetekst"
+        opplastingsValgKommentar:
+          $ref: "#/components/schemas/OpplastingsvalgKommentar"
 
     Vedleggsnr:
       type: string
       description: NAVs identifikasjon av dokumenttype enten som Skjemanummer eller vedleggsnummer.
       example: NAV 14-35.01 eller T7
+
+    Vedleggsurl:
+      type: string
+      description: Noen vedlegg er NAV-skjemaer som brukeren må fylle ut først og laste det opp som vedlegg. Vedleggsurl er en lenke til skjemaet (enten PDF eller til fyllut) som brukeren kan laste ned/fylle ut.
+      example: https://cdn.sanity.io/files/gx9wf39f/soknadsveiviser-p/7146ae917cf8423f71edbf37369da5a6b2a23524.pdf
 
     VisningsSteg:
       type: integer
@@ -1446,8 +2359,13 @@ components:
 
     VisningsType:
       type: string
-      enum: [ "fyllUt", "dokumentinnsending", "ettersending" ]
+      enum: [ "fyllUt", "dokumentinnsending", "ettersending", "lospost" ]
       description: Angir visningsmodus gitt opphav til søknaden
+
+    EnvQualifier:
+      type: string
+      enum: [ "preprodIntern", "preprodAltIntern", "preprodAnsatt", "preprodAltAnsatt", "delingslenke", "local" ]
+      description: Angir et ønske om miljø
 
 
 security: [ ]

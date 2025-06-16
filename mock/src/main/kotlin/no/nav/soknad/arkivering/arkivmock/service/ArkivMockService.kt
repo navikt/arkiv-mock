@@ -15,7 +15,8 @@ import java.util.*
 class ArkivMockService(private val behaviourService: BehaviourService, private val kafkaPublisher: KafkaPublisher) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
-	fun archive(key: String, arkivData: ArkivData): String? {
+	fun archive(key: String, arkivData: ArkivData): String {
+		logger.info("$key: Will archive data for user ${arkivData.bruker} - ${arkivData.tittel} (tema ${arkivData.tema})")
 		reactToArchiveRequest(key)
 
 		publishReceivedDataOnKafka(key, arkivData)
@@ -55,8 +56,10 @@ class ArkivMockService(private val behaviourService: BehaviourService, private v
 
 	private fun publishReceivedDataOnKafka(key: String, arkivData: ArkivData) {
 		try {
+			logger.info("$key: Will publish data to Kafka topic for ${arkivData.bruker} (tema: ${arkivData.tema})")
 			val data = createArchiveEntity(key, arkivData)
 			kafkaPublisher.putDataOnTopic(key, data)
+			logger.info("$key: Published data to Kafka topic for ${arkivData.bruker} (tema: ${arkivData.tema})")
 		} catch (e: Exception) {
 			logger.error("$key: Failed to publish data to Kafka topic!", e)
 		}
