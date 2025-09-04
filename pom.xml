@@ -22,7 +22,7 @@
 	</modules>
 
 	<properties>
-		<token-support.version>5.0.30</token-support.version>
+		<token-support.version>5.0.34</token-support.version>
 
 		<spring-web.version>6.2.10</spring-web.version>
 		<logstash.version>8.1</logstash.version>
@@ -50,6 +50,11 @@
 	</properties>
 
 	<repositories>
+		<repository>
+			<id>github</id>
+			<name>GitHub felles Maven Packagesfor Navikt</name>
+			<url>https://maven.pkg.github.com/navikt/maven-release</url>
+		</repository>
 		<repository>
 			<id>confluent</id>
 			<url>https://packages.confluent.io/maven</url>
