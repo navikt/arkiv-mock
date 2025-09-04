@@ -10,6 +10,7 @@ class ArchiveEntity(
 	val id: String,
 	val title: String,
 	val tema: String,
+	val kanal: String,
 	val timesaved: Long
 ) {
 	override fun toString(): String {
