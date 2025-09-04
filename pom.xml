@@ -25,8 +25,8 @@
 		<token-support.version>5.0.30</token-support.version>
 
 		<spring-web.version>6.2.10</spring-web.version>
-		<logstash.version>7.4</logstash.version>
-		<kafka.version>3.9.0</kafka.version>
+		<logstash.version>8.1</logstash.version>
+		<kafka.version>4.1.0</kafka.version>
 		<jakarta-servlet-api.version>6.1.0</jakarta-servlet-api.version>
 		<jakarta-validation-api.version>3.1.0</jakarta-validation-api.version>
 		<jackson-databind-nullable.version>0.2.7</jackson-databind-nullable.version>
