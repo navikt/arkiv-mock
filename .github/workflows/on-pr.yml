@@ -19,7 +19,7 @@ jobs:
           cache: 'maven'
 
       - name: 'Build the code for soknadsmottaker'
-        uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
+        uses: navikt/archiving-infrastructure/.github/checkout-and-build@token-til-env
         with:
           component_name: soknadsmottaker
           skip_tests: true
@@ -33,7 +33,7 @@ jobs:
           skip_tests: true
 
       - name: 'Build the code for soknadsarkiverer'
-        uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
+        uses: navikt/archiving-infrastructure/.github/checkout-and-build@token-til-env
         with:
           component_name: soknadsarkiverer
           skip_tests: true
@@ -41,7 +41,7 @@ jobs:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
       - name: 'Build the code for innsending-api'
-        uses: navikt/archiving-infrastructure/.github/checkout-and-build@token-to-env
+        uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
         with:
           component_name: innsending-api
           skip_tests: true
@@ -58,7 +58,7 @@ jobs:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
       - name: 'Run the end-to-end-tests'
-        uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
+        uses: navikt/archiving-infrastructure/.github/checkout-and-build@token-til-env
         with:
           component_name: archiving-infrastructure
           sub_directory: system-tests
