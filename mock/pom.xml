@@ -254,6 +254,11 @@
 
 	<repositories>
 		<repository>
+			<id>github</id>
+			<name>GitHub felles Maven Packagesfor Navikt</name>
+			<url>https://maven.pkg.github.com/navikt/maven-release</url>
+		</repository>
+		<repository>
 			<id>confluent</id>
 			<url>https://packages.confluent.io/maven</url>
 		</repository>
