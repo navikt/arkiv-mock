@@ -41,7 +41,7 @@ jobs:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
       - name: 'Build the code for innsending-api'
-        uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
+        uses: navikt/archiving-infrastructure/.github/checkout-and-build@token-to-env
         with:
           component_name: innsending-api
           skip_tests: true
