@@ -23,20 +23,16 @@ jobs:
         with:
           component_name: soknadsmottaker
           skip_tests: true
+          branch: feature/token-til-env
         env:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
-      - name: 'Build the code for soknadsfillager'
-        uses: navikt/archiving-infrastructure/.github/checkout-and-build@token-til-env
-        with:
-          component_name: soknadsfillager
-          skip_tests: true
-
       - name: 'Build the code for soknadsarkiverer'
-        uses: navikt/archiving-infrastructure/.github/checkout-and-build@token-til-env
+        uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
         with:
           component_name: soknadsarkiverer
           skip_tests: true
+          branch: feature/token-til-env
         env:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
@@ -58,9 +54,10 @@ jobs:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
       - name: 'Run the end-to-end-tests'
-        uses: navikt/archiving-infrastructure/.github/checkout-and-build@token-til-env
+        uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
         with:
           component_name: archiving-infrastructure
           sub_directory: system-tests
           skip_tests: false
+          branch: feature/token-til-env
           run_docker_build: false
