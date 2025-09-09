@@ -47,11 +47,11 @@ class ArkivMockService(private val behaviourService: BehaviourService, private v
 
 	private fun createArchiveEntity(key: String, arkivData: ArkivData): ArchiveEntity {
 		return ArchiveEntity(
-			key,
-			arkivData.tittel,
-			arkivData.tema,
-			arkivData.kanal,
-			LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli()
+			id = key,
+			title = arkivData.tittel,
+			tema = arkivData.tema,
+			kanal = arkivData.kanal,
+			timesaved = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli()
 		)
 	}
 
