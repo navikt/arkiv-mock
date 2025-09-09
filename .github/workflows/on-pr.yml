@@ -32,7 +32,6 @@ jobs:
         with:
           component_name: soknadsarkiverer
           skip_tests: true
-          branch: feature/token-til-env
         env:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
@@ -59,5 +58,4 @@ jobs:
           component_name: archiving-infrastructure
           sub_directory: system-tests
           skip_tests: false
-          branch: feature/token-til-env
           run_docker_build: false
