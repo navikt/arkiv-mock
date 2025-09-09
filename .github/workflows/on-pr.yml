@@ -59,6 +59,6 @@ jobs:
         with:
           component_name: archiving-infrastructure
           sub_directory: system-tests
-          branch: feature/no-login
+          branch: feature/nologin
           skip_tests: false
           run_docker_build: false
