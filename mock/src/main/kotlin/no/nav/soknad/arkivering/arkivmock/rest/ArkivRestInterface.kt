@@ -21,7 +21,8 @@ class ArkivRestInterface(private val arkivMockService: ArkivMockService) {
 	fun receiveJournalpost(@RequestBody arkivData: ArkivData): ResponseEntity<String> {
 
 		val key = arkivData.eksternReferanseId
-		logger.info("$key: Received journalpost")
+		val kanal = arkivData.kanal
+		logger.info("$key: Received journalpost på kanal $kanal")
 
 		val responseBody = arkivMockService.archive(key, arkivData)
 		return ResponseEntity(responseBody, HttpStatus.OK)
