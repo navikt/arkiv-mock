@@ -50,7 +50,6 @@ class ArkivMockService(private val behaviourService: BehaviourService, private v
 			key,
 			arkivData.tittel,
 			arkivData.tema,
-			arkivData.kanal,
 			LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli()
 		)
 	}

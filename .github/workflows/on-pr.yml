@@ -23,14 +23,9 @@ jobs:
         with:
           component_name: soknadsmottaker
           skip_tests: true
+          branch: feature/token-til-env
         env:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
-
-      - name: 'Build the code for soknadsfillager'
-        uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
-        with:
-          component_name: soknadsfillager
-          skip_tests: true
 
       - name: 'Build the code for soknadsarkiverer'
         uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
