@@ -24,6 +24,7 @@ import java.util.*
 class IntegrationTest {
 	private val tema = "Tema"
 	private val title = "Title"
+	private val kanal = "NAV_NO"
 
 	@Autowired
 	private lateinit var arkivRestInterface: ArkivRestInterface
@@ -45,6 +46,7 @@ class IntegrationTest {
 		val result = captor.captured
 		assertEquals(id, result.id)
 		assertEquals(tema, result.tema)
+		assertEquals(kanal, result.kanal)
 		assertEquals(title, result.title)
 		assertTrue(result.timesaved >= timeWhenStarting)
 		assertTrue(result.timesaved <= LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli())
@@ -53,6 +55,6 @@ class IntegrationTest {
 	private fun createRequestData(id: String) =
 		ArkivData(
 			AvsenderMottaker("12345678901", "FNR"), Bruker("12345678901", "FNR"), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME), emptyList(),
-			id, "INNGAAENDE", "NAV_NO", tema, title
+			id, "INNGAAENDE", kanal, tema, title
 		)
 }

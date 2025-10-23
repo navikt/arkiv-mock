@@ -23,7 +23,6 @@ jobs:
         with:
           component_name: soknadsmottaker
           skip_tests: true
-          branch: feature/nologin-send-inn
         env:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
@@ -32,7 +31,6 @@ jobs:
         with:
           component_name: soknadsarkiverer
           skip_tests: true
-          branch: feature/nologin
         env:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
@@ -41,7 +39,7 @@ jobs:
         with:
           component_name: innsending-api
           skip_tests: true
-          branch: feature/uinnlogget-send-inn
+          branch: feature/uinnlogget-soknad-uten-brukerid
         env:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
