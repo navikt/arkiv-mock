@@ -23,6 +23,7 @@ jobs:
         with:
           component_name: soknadsmottaker
           skip_tests: true
+          branch: feature/nologin-send-inn
         env:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
@@ -31,6 +32,7 @@ jobs:
         with:
           component_name: soknadsarkiverer
           skip_tests: true
+          branch: feature/nologin
         env:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
@@ -47,7 +49,7 @@ jobs:
         with:
           component_name: arkiv-mock
           skip_tests: true
-          branch: ${GITHUB_HEAD_REF} # Branch of current PR
+          branch: feature/no-login
         env:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
