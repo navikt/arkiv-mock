@@ -1,12 +1,9 @@
-name: Build, push, and deploy
+name: Build
 
 on: [push]
 
-permissions:
-  id-token: "write"
-
 jobs:
-  build-and-push:
+  build:
     name: Build and push Docker container
     permissions:
       contents: "read"
@@ -26,28 +23,3 @@ jobs:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
         run: mvn install --settings maven-settings.xml --file pom.xml
-
-      - name: Build and push Docker image
-        if: ${{ github.actor != 'dependabot[bot]' }}
-        uses: nais/docker-build-push@v0
-        id: docker-build-push
-        with:
-          team: team-soknad
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          image_suffix: dev
-    outputs:
-      image: ${{ steps.docker-build-push.outputs.image }}
-
-  deploy-loadtests:
-    name: Deploy to loadtests
-    if: ${{ github.actor != 'dependabot[bot]' }}
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: dev-gcp
-          RESOURCE: .nais/nais-dev.yml,.nais/topics/config-systemtests-entities.yml,.nais/topics/config-systemtests-numberofcalls.yml
-          VAR: image=${{needs.build-and-push.outputs.image}}
