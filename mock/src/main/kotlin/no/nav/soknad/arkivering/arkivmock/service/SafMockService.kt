@@ -11,12 +11,13 @@ import no.nav.soknad.arkivering.saf.generated.hentjournalpostgitteksternreferans
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
+import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class SafMockService {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
-	private val safBehaviours: MutableMap<String, SafResponse_Behaviour> = mutableMapOf()
+	private val safBehaviours: MutableMap<String, SafResponse_Behaviour> = ConcurrentHashMap()
 
 	fun setSafResponse(key: String, response: String, forAttempts: Int) {
 		safBehaviours.put(key, SafResponse_Behaviour(behaviour = SafResponses.valueOf(response), forAttempts = forAttempts))
