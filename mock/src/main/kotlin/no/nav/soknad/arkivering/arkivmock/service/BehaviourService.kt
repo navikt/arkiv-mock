@@ -6,12 +6,13 @@ import no.nav.soknad.arkivering.arkivmock.exceptions.*
 import no.nav.soknad.arkivering.arkivmock.service.BEHAVIOUR.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class BehaviourService(val objectMapper: ObjectMapper) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
-	private val behaviours: MutableMap<String, BehaviourDto> = mutableMapOf()
+	private val behaviours: MutableMap<String, BehaviourDto> = ConcurrentHashMap()
 
 	fun setNormalBehaviour(key: String) {
 		val calls = behaviours[key]?.calls ?: 0

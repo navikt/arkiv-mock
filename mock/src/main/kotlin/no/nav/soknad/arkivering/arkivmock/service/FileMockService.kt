@@ -4,12 +4,13 @@ import no.nav.soknad.innsending.model.SoknadFile
 import org.springframework.stereotype.Service
 import java.io.ByteArrayOutputStream
 import java.time.OffsetDateTime
+import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class FileMockService {
 
 
-	private val fileBehaviours: MutableMap<String, FileResponse_Behaviour> = mutableMapOf()
+	private val fileBehaviours: MutableMap<String, FileResponse_Behaviour> = ConcurrentHashMap()
 
 	fun setFileResponse(key: String, response: String, forAttempts: Int) {
 		fileBehaviours.put(key, FileResponse_Behaviour(behaviour = FileResponses.valueOf(response), forAttempts = forAttempts))
