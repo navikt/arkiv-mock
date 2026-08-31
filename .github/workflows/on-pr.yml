@@ -16,38 +16,24 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-          cache: 'maven'
 
-      - name: 'Build the code for soknadsmottaker'
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: e2e-m2-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            e2e-m2-${{ runner.os }}-
+
+      - name: 'Build the code for the components'
         uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
         with:
-          component_name: soknadsmottaker
-          skip_tests: true
-        env:
-          GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
-
-      - name: 'Build the code for soknadsarkiverer'
-        uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
-        with:
-          component_name: soknadsarkiverer
-          skip_tests: true
-        env:
-          GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
-
-      - name: 'Build the code for innsending-api'
-        uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
-        with:
-          component_name: innsending-api
-          skip_tests: true
-        env:
-          GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
-
-      - name: 'Build the code for arkiv-mock (this PR)'
-        uses: navikt/archiving-infrastructure/.github/checkout-and-build@main
-        with:
-          component_name: arkiv-mock
-          skip_tests: true
-          branch: ${GITHUB_HEAD_REF} # Branch of current PR
+          component_names: |
+            soknadsmottaker
+            soknadsarkiverer
+            innsending-api
+            arkiv-mock@${{ github.head_ref }}
+          prepull_test_images: true
         env:
           GITHUB_NAV_TOKEN: ${{ secrets.READER_TOKEN }}
 
