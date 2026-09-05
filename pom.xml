@@ -24,7 +24,7 @@
 	<properties>
 		<token-support.version>5.0.40</token-support.version>
 
-		<spring-web.version>6.2.10</spring-web.version>
+		<spring-web.version>7.0.6</spring-web.version>
 		<logstash.version>8.1</logstash.version>
 		<kafka.version>4.2.0</kafka.version>
 		<jakarta-servlet-api.version>6.1.0</jakarta-servlet-api.version>
