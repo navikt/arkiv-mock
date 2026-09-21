@@ -11,7 +11,8 @@ class ArchiveEntity(
 	val title: String,
 	val tema: String,
 	val kanal: String,
-	val timesaved: Long
+	val timesaved: Long,
+	val overstyrInnsynsregler: String? = null
 ) {
 	override fun toString(): String {
 		val mapper = ObjectMapper()

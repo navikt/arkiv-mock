@@ -51,7 +51,8 @@ class ArkivMockService(private val behaviourService: BehaviourService, private v
 			title = arkivData.tittel,
 			tema = arkivData.tema,
 			kanal = arkivData.kanal,
-			timesaved = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli()
+			timesaved = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli(),
+			overstyrInnsynsregler = arkivData.overstyrInnsynsregler
 		)
 	}
 

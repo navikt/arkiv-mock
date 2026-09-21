@@ -48,13 +48,26 @@ class IntegrationTest {
 		assertEquals(tema, result.tema)
 		assertEquals(kanal, result.kanal)
 		assertEquals(title, result.title)
+		assertEquals(null, result.overstyrInnsynsregler)
 		assertTrue(result.timesaved >= timeWhenStarting)
 		assertTrue(result.timesaved <= LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli())
 	}
 
-	private fun createRequestData(id: String) =
+	@Test
+	fun `Will broadcast overstyrInnsynsregler when receiving message`() {
+		val id = UUID.randomUUID().toString()
+		behaviourMocking.setNormalResponseBehaviour(id)
+
+		arkivRestInterface.receiveJournalpost(createRequestData(id, "VISES_MASKINELT_GODKJENT"))
+
+		val captor = slot<ArchiveEntity>()
+		verify(exactly = 1) { kafkaPublisher.putDataOnTopic(eq(id), capture(captor), any()) }
+		assertEquals("VISES_MASKINELT_GODKJENT", captor.captured.overstyrInnsynsregler)
+	}
+
+	private fun createRequestData(id: String, overstyrInnsynsregler: String? = null) =
 		ArkivData(
 			AvsenderMottaker("12345678901", "FNR"), Bruker("12345678901", "FNR"), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME), emptyList(),
-			id, "INNGAAENDE", kanal, tema, title
+			id, "INNGAAENDE", kanal, tema, title, overstyrInnsynsregler
 		)
 }
