@@ -9,7 +9,8 @@ data class ArkivData(
 	val journalpostType: String,
 	val kanal: String,
 	val tema: String,
-	val tittel: String
+	val tittel: String,
+	val overstyrInnsynsregler: String? = null
 )
 
 data class Bruker(val id: String, val idType: String)
