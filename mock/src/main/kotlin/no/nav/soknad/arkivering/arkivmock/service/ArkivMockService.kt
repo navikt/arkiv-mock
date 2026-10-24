@@ -6,6 +6,7 @@ import no.nav.soknad.arkivering.arkivmock.dto.ArchiveEntity
 import no.nav.soknad.arkivering.arkivmock.dto.Dokumenter
 import no.nav.soknad.arkivering.arkivmock.dto.OpprettJournalpostResponse
 import no.nav.soknad.arkivering.arkivmock.service.kafka.KafkaPublisher
+import org.apache.pdfbox.Loader
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -64,12 +65,25 @@ class ArkivMockService(
 					ArchiveDocument(
 						tittel = dokument.tittel,
 						brevkode = dokument.brevkode,
-						variantformater = dokument.dokumentvarianter.map { it.variantformat }
+						variantformater = dokument.dokumentvarianter.map { it.variantformat },
+						antallSider = dokument.dokumentvarianter
+							.firstOrNull { variant ->
+								variant.variantformat.equals("ARKIV", ignoreCase = true) &&
+									variant.filtype.lowercase() in setOf("pdf", "pdfa", "application/pdf", "application/pdfa")
+							}
+							?.let { variant -> readPageCount(variant.fysiskDokument) }
 					)
 				}
 			} else null
 		)
 	}
+
+	private fun readPageCount(pdfBytes: ByteArray): Int? =
+		try {
+			Loader.loadPDF(pdfBytes).use { it.numberOfPages }
+		} catch (_: Exception) {
+			null
+		}
 
 	private fun publishReceivedDataOnKafka(key: String, arkivData: ArkivData) {
 		try {
