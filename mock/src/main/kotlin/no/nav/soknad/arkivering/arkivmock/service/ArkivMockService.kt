@@ -1,18 +1,24 @@
 package no.nav.soknad.arkivering.arkivmock.service
 
 import no.nav.soknad.arkivering.arkivmock.dto.ArkivData
+import no.nav.soknad.arkivering.arkivmock.dto.ArchiveDocument
 import no.nav.soknad.arkivering.arkivmock.dto.ArchiveEntity
 import no.nav.soknad.arkivering.arkivmock.dto.Dokumenter
 import no.nav.soknad.arkivering.arkivmock.dto.OpprettJournalpostResponse
 import no.nav.soknad.arkivering.arkivmock.service.kafka.KafkaPublisher
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
 
 @Service
-class ArkivMockService(private val behaviourService: BehaviourService, private val kafkaPublisher: KafkaPublisher) {
+class ArkivMockService(
+	private val behaviourService: BehaviourService,
+	private val kafkaPublisher: KafkaPublisher,
+	@Value("\${PUBLISH_ARCHIVE_DOCUMENT_METADATA:false}") private val publishArchiveDocumentMetadata: Boolean = false
+) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
 	fun archive(key: String, arkivData: ArkivData): String {
@@ -52,7 +58,16 @@ class ArkivMockService(private val behaviourService: BehaviourService, private v
 			tema = arkivData.tema,
 			kanal = arkivData.kanal,
 			timesaved = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli(),
-			overstyrInnsynsregler = arkivData.overstyrInnsynsregler
+			overstyrInnsynsregler = arkivData.overstyrInnsynsregler,
+			dokumenter = if (publishArchiveDocumentMetadata) {
+				arkivData.dokumenter.map { dokument ->
+					ArchiveDocument(
+						tittel = dokument.tittel,
+						brevkode = dokument.brevkode,
+						variantformater = dokument.dokumentvarianter.map { it.variantformat }
+					)
+				}
+			} else null
 		)
 	}
 
