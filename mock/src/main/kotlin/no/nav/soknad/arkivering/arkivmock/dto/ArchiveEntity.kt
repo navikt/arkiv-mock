@@ -28,5 +28,6 @@ class ArchiveEntity(
 data class ArchiveDocument(
 	val tittel: String,
 	val brevkode: String?,
-	val variantformater: List<String>
+	val variantformater: List<String>,
+	val antallSider: Int? = null
 )

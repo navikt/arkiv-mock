@@ -16,12 +16,15 @@ import no.nav.soknad.arkivering.arkivmock.rest.BehaviourMocking
 import no.nav.soknad.arkivering.arkivmock.service.ArkivMockService
 import no.nav.soknad.arkivering.arkivmock.service.BehaviourService
 import no.nav.soknad.arkivering.arkivmock.service.kafka.KafkaPublisher
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.PDPage
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -58,8 +61,10 @@ class IntegrationTest {
 		assertEquals(null, result.overstyrInnsynsregler)
 		assertEquals(
 			listOf(
-				ArchiveDocument("Syntetisk hoveddokument", "TEST-HOVED", listOf("ARKIV", "ORIGINAL")),
-				ArchiveDocument("Syntetisk vedlegg", null, listOf("ORIGINAL"))
+				ArchiveDocument("Syntetisk hoveddokument", "TEST-HOVED", listOf("ARKIV", "ORIGINAL"), 2),
+				ArchiveDocument("Syntetisk vedlegg", null, listOf("ORIGINAL")),
+				ArchiveDocument("Syntetisk énsidesdokument", null, listOf("ARKIV"), 1),
+				ArchiveDocument("Syntetisk ugyldig PDF", null, listOf("ARKIV"))
 			),
 			result.dokumenter
 		)
@@ -131,15 +136,36 @@ class IntegrationTest {
 			tittel = "Syntetisk hoveddokument",
 			brevkode = "TEST-HOVED",
 			dokumentvarianter = listOf(
-				DokumentVariant("hoved.pdf", "application/pdf", byteArrayOf(1), "ARKIV"),
-				DokumentVariant("hoved-original.pdf", "application/pdf", byteArrayOf(2), "ORIGINAL")
+				DokumentVariant("hoved.pdf", "Application/PdF", syntheticPdf(2), "ARKIV"),
+				DokumentVariant("hoved-original.json", "application/json", syntheticPdf(1), "ORIGINAL")
 			)
 		),
 		Dokument(
 			tittel = "Syntetisk vedlegg",
 			dokumentvarianter = listOf(
-				DokumentVariant("vedlegg.pdf", "application/pdf", byteArrayOf(3), "ORIGINAL")
+				DokumentVariant("vedlegg.json", "application/json", byteArrayOf(3), "ORIGINAL")
+			)
+		),
+		Dokument(
+			tittel = "Syntetisk énsidesdokument",
+			dokumentvarianter = listOf(
+				DokumentVariant("enside.pdf", "pDfA", syntheticPdf(1), "ARKIV")
+			)
+		),
+		Dokument(
+			tittel = "Syntetisk ugyldig PDF",
+			dokumentvarianter = listOf(
+				DokumentVariant("ugyldig.pdf", "application/pdf", byteArrayOf(1, 2, 3), "ARKIV")
 			)
 		)
 	)
+
+	private fun syntheticPdf(numberOfPages: Int): ByteArray =
+		PDDocument().use { document ->
+			repeat(numberOfPages) { document.addPage(PDPage()) }
+			ByteArrayOutputStream().use { output ->
+				document.save(output)
+				output.toByteArray()
+			}
+		}
 }
