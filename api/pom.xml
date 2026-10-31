@@ -50,7 +50,7 @@
 		<dependency>
 			<groupId>no.nav.soknad.innsending</groupId>
 			<artifactId>innsending-api</artifactId>
-			<version>c21da5c-prod</version>
+			<version>653bc03-dev</version>
 			<classifier>openapi-spec</classifier>
 			<type>zip</type>
 		</dependency>
