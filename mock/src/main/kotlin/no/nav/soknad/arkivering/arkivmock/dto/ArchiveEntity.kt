@@ -1,7 +1,7 @@
 package no.nav.soknad.arkivering.arkivmock.dto
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
+import tools.jackson.databind.SerializationFeature
+import no.nav.soknad.arkivering.arkivmock.config.jsonMapperBuilder
 import com.fasterxml.jackson.annotation.JsonInclude
 
 /**
@@ -18,9 +18,9 @@ class ArchiveEntity(
 	val dokumenter: List<ArchiveDocument>? = null
 ) {
 	override fun toString(): String {
-		val mapper = ObjectMapper()
-		mapper.enable(SerializationFeature.INDENT_OUTPUT)
-		mapper.findAndRegisterModules()
+		val mapper = jsonMapperBuilder()
+			.enable(SerializationFeature.INDENT_OUTPUT)
+			.build()
 		return mapper.writeValueAsString(this)
 	}
 }
