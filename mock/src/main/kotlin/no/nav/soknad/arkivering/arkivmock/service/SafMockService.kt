@@ -2,7 +2,7 @@ package no.nav.soknad.arkivering.arkivmock.service
 
 import com.expediagroup.graphql.client.types.GraphQLClientError
 import com.expediagroup.graphql.client.types.GraphQLClientResponse
-import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.soknad.arkivering.arkivmock.config.jsonMapperBuilder
 import no.nav.soknad.arkivering.saf.generated.HentJournalpostGittEksternReferanseId
 import no.nav.soknad.arkivering.saf.generated.enums.*
 import no.nav.soknad.arkivering.saf.generated.hentjournalpostgitteksternreferanseid.AvsenderMottaker
@@ -58,7 +58,7 @@ class SafMockService {
 	private fun createSafResponse_withJournalpost(innsendingsId: String): String
 	{
 		logger.info("$innsendingsId: ***SAF returner journalpost****")
-		val objectMapper = ObjectMapper()
+		val objectMapper = jsonMapperBuilder().build()
 		return objectMapper.writeValueAsString(
 			GraphQlResponse(data = HentJournalpostGittEksternReferanseId.Result(journalpost = buildJournalpost(innsendingsId)), errors = null, extensions = null)
 		)
@@ -67,7 +67,7 @@ class SafMockService {
 	private fun createSafResponse_withoutJournalpost(innsendingsId: String): String
 	{
 		logger.info("$innsendingsId: -----SAF returner tom journalpost-----")
-		val objectMapper = ObjectMapper()
+		val objectMapper = jsonMapperBuilder().build()
 		return objectMapper.writeValueAsString(
 			HentJournalpostGittEksternReferanseId.Result(journalpost = null)
 		)

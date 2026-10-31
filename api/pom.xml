@@ -21,13 +21,11 @@
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>
-			<version>${jakarta-servlet-api.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>
-			<version>${jakarta-validation-api.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.annotation</groupId>
@@ -118,7 +116,7 @@
 						<apiPackage>no.nav.soknad.innsending.api</apiPackage>
 						<modelPackage>no.nav.soknad.innsending.model</modelPackage>
 						<configOptions>
-							<useSpringBoot3>true</useSpringBoot3>
+							<useSpringBoot4>true</useSpringBoot4>
 							<gradleBuildFile>false</gradleBuildFile>
 							<exceptionHandler>false</exceptionHandler>
 							<interfaceOnly>true</interfaceOnly>
