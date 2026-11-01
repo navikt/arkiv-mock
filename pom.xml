@@ -33,7 +33,7 @@
 		<coroutines.version>1.10.2</coroutines.version>
 		<springmockk.version>4.0.2</springmockk.version>
 		<mockk.version>1.14.9</mockk.version>
-		<graphql-kotlin.version>8.8.1</graphql-kotlin.version>
+		<graphql-kotlin.version>11.0.0</graphql-kotlin.version>
 		<pdfbox.version>3.0.8</pdfbox.version>
 		<!--OpenAPI-->
 		<springdoc-openapi.version>2.8.11</springdoc-openapi.version>
