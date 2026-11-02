@@ -34,7 +34,7 @@
 		<pdfbox.version>3.0.8</pdfbox.version>
 		<!--OpenAPI-->
 		<springdoc-openapi.version>3.1.1</springdoc-openapi.version>
-		<swagger-annotations.version>2.2.55</swagger-annotations.version>
+		<swagger-annotations.version>3.0.0</swagger-annotations.version>
 		<openapi-generator-maven-plugin.version>7.26.0</openapi-generator-maven-plugin.version>
 
 		<okhttp3.version>5.5.1</okhttp3.version>
