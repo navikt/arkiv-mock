@@ -1,6 +1,7 @@
 package no.nav.soknad.arkivering.arkivmock
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.soknad.arkivering.arkivmock.config.jsonMapperBuilder
+import tools.jackson.databind.json.JsonMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.slot
 import io.mockk.verify
@@ -40,6 +41,8 @@ class IntegrationTest {
 	private lateinit var arkivRestInterface: ArkivRestInterface
 	@Autowired
 	private lateinit var behaviourMocking: BehaviourMocking
+	@Autowired
+	private lateinit var objectMapper: JsonMapper
 	@MockkBean(relaxed = true)
 	private lateinit var kafkaPublisher: KafkaPublisher
 
@@ -107,9 +110,45 @@ class IntegrationTest {
 	}
 
 	@Test
+	fun `archive JSON preserves field values and optional metadata`() {
+		val entity = ArchiveEntity(
+			id = "synthetic-id",
+			title = title,
+			tema = tema,
+			kanal = kanal,
+			timesaved = 123L,
+			dokumenter = listOf(ArchiveDocument("Syntetisk dokument", null, listOf("ARKIV"), 2))
+		)
+
+		val decoded = objectMapper.readValue(entity.toString(), ArchiveEntity::class.java)
+		assertEquals(entity.id, decoded.id)
+		assertEquals(entity.title, decoded.title)
+		assertEquals(entity.tema, decoded.tema)
+		assertEquals(entity.kanal, decoded.kanal)
+		assertEquals(entity.timesaved, decoded.timesaved)
+		assertEquals(entity.dokumenter, decoded.dokumenter)
+		assertEquals(null, decoded.overstyrInnsynsregler)
+	}
+
+	@Test
+	fun `Norwegian field names survive Jackson serialization`() {
+		val value = NorskeFelt(årsak = "Syntetisk årsak", ønsket = true, ærlig = 2)
+		for (mapper in listOf(objectMapper, jsonMapperBuilder().build())) {
+			val json = mapper.writeValueAsString(value)
+			val tree = mapper.readTree(json)
+			assertTrue(tree.has("årsak"))
+			assertTrue(tree.has("ønsket"))
+			assertTrue(tree.has("ærlig"))
+			assertEquals(value, mapper.readValue(json, NorskeFelt::class.java))
+		}
+	}
+
+	data class NorskeFelt(val årsak: String, val ønsket: Boolean, val ærlig: Int)
+
+	@Test
 	fun `service omits document metadata unless explicitly enabled`() {
 		val id = UUID.randomUUID().toString()
-		val behaviourService = BehaviourService(ObjectMapper())
+		val behaviourService = BehaviourService(jsonMapperBuilder().build())
 		behaviourService.setNormalBehaviour(id)
 		val service = ArkivMockService(behaviourService, kafkaPublisher)
 

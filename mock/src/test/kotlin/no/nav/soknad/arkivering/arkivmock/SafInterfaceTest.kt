@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
+import tools.jackson.databind.json.JsonMapper
 import java.util.*
 
 @SpringBootTest
@@ -20,6 +21,8 @@ class SafInterfaceTest {
 
 	@Autowired
 	private lateinit var safFetchBehaviour: SafFetchBehaviour
+	@Autowired
+	private lateinit var objectMapper: JsonMapper
 
 
 	@Test
@@ -57,6 +60,15 @@ class SafInterfaceTest {
 		Assertions.assertEquals(HttpStatus.OK, response.statusCode)
 		val body = response.body
 		Assertions.assertTrue(body != null && body.contains(eksternReferanseId))
+		val json = objectMapper.readTree(requireNotNull(body))
+		Assertions.assertTrue(json.has("errors"))
+		Assertions.assertTrue(json.has("extensions"))
+		val journalpost = json["data"]["journalpost"]
+		Assertions.assertEquals("12345", journalpost["journalpostId"].asString())
+		Assertions.assertEquals(eksternReferanseId, journalpost["eksternReferanseId"].asString())
+		Assertions.assertEquals("BID", journalpost["tema"].asString())
+		Assertions.assertEquals("MOTTATT", journalpost["journalstatus"].asString())
+		Assertions.assertEquals("I", journalpost["journalposttype"].asString())
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 package no.nav.soknad.arkivering.arkivmock.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import tools.jackson.databind.json.JsonMapper
 import no.nav.soknad.arkivering.arkivmock.dto.OpprettJournalpostResponse
 import no.nav.soknad.arkivering.arkivmock.exceptions.*
 import no.nav.soknad.arkivering.arkivmock.service.BEHAVIOUR.*
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
-class BehaviourService(val objectMapper: ObjectMapper) {
+class BehaviourService(val objectMapper: JsonMapper) {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
 	private val behaviours: MutableMap<String, BehaviourDto> = ConcurrentHashMap()

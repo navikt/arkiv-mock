@@ -12,9 +12,8 @@ class WebSecurityConfig {
 	@Bean
 	fun filterChain(http: HttpSecurity): SecurityFilterChain {
 		http
-			.csrf().disable()
-			.sessionManagement()
-			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+			.csrf { it.disable() }
+			.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
 		return http.build()
 	}
 }
